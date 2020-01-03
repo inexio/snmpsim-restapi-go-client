@@ -637,7 +637,7 @@ func TestManagementClient_Agent_Failures(t *testing.T) {
 		}
 	}
 
-	//remove non exisitng engine from exisiting agent
+	//remove non existing engine from exisiting agent
 	err = client.RemoveEngineFromAgent(agent.Id, -1)
 	if assert.Error(t, err, "no error when removing non existing engine from existing agent") {
 		if err, ok := err.(HttpError); assert.True(t, ok, "error is not a http error", err.Error()) {
@@ -645,7 +645,7 @@ func TestManagementClient_Agent_Failures(t *testing.T) {
 		}
 	}
 
-	//remove exisitng engine from non exisiting agent
+	//remove existing engine from non exisiting agent
 	err = client.RemoveEngineFromAgent(-1, engine.Id)
 	if assert.Error(t, err, "no error when removing existing engine from non existing agent") {
 		if err, ok := err.(HttpError); assert.True(t, ok, "error is not a http error", err.Error()) {
@@ -753,7 +753,7 @@ func TestManagementClient_Lab_Failures(t *testing.T) {
 		}
 	}
 
-	//remove non exisitng agent from exisiting lab
+	//remove non existing agent from exisiting lab
 	err = client.RemoveAgentFromLab(lab.Id, -1)
 	if assert.Error(t, err, "no error when removing non existing agent from existing lab") {
 		if err, ok := err.(HttpError); assert.True(t, ok, "error is not a http error", err.Error()) {
@@ -761,7 +761,7 @@ func TestManagementClient_Lab_Failures(t *testing.T) {
 		}
 	}
 
-	//remove exisitng agent from non exisiting lab
+	//remove existing agent from non exisiting lab
 	err = client.RemoveAgentFromLab(-1, agent.Id)
 	if assert.Error(t, err, "no error when removing existing agent from non existing lab") {
 		if err, ok := err.(HttpError); assert.True(t, ok, "error is not a http error", err.Error()) {
@@ -888,7 +888,7 @@ func TestManagementClient_Engine_Failures(t *testing.T) {
 		}
 	}
 
-	//remove non exisitng user from exisiting engine
+	//remove non existing user from exisiting engine
 	err = client.RemoveUserFromEngine(engine.Id, -1)
 	if assert.Error(t, err, "no error when removing non existing user from existing engine") {
 		if err, ok := err.(HttpError); assert.True(t, ok, "error is not a http error", err.Error()) {
@@ -896,7 +896,7 @@ func TestManagementClient_Engine_Failures(t *testing.T) {
 		}
 	}
 
-	//remove exisitng user from non exisiting engine
+	//remove existing user from non exisiting engine
 	err = client.RemoveUserFromEngine(-1, user.Id)
 	if assert.Error(t, err, "no error when removing existing user from non existing engine") {
 		if err, ok := err.(HttpError); assert.True(t, ok, "error is not a http error", err.Error()) {
@@ -964,7 +964,7 @@ func TestManagementClient_Engine_Failures(t *testing.T) {
 		}
 	}
 
-	//remove non exisitng endpoint from exisiting engine
+	//remove non existing endpoint from exisiting engine
 	err = client.RemoveEndpointFromEngine(engine.Id, -1)
 	if assert.Error(t, err, "no error when removing non existing endpoint from existing engine") {
 		if err, ok := err.(HttpError); assert.True(t, ok, "error is not a http error", err.Error()) {
@@ -972,7 +972,7 @@ func TestManagementClient_Engine_Failures(t *testing.T) {
 		}
 	}
 
-	//remove exisitng endpoint from non exisiting engine
+	//remove existing endpoint from non exisiting engine
 	err = client.RemoveEndpointFromEngine(-1, endpoint.Id)
 	if assert.Error(t, err, "no error when removing existing endpoint from non existing engine") {
 		if err, ok := err.(HttpError); assert.True(t, ok, "error is not a http error", err.Error()) {
