@@ -1,4 +1,4 @@
-package snmpsim_restapi_client
+package snmpsimclient
 
 import (
 	"fmt"
@@ -1223,7 +1223,7 @@ func createAgentAndCheckForSuccess(t *testing.T, client *ManagementClient, name,
 	}
 
 	if !assert.True(t, agentExists(agent, agents), "created agent was not found in list of agents") {
-		return Agent{}, errors.New("assertion failed!")
+		return Agent{}, errors.New("assertion failed")
 	}
 	return agent, nil
 }
@@ -1237,7 +1237,7 @@ func deleteAgentAndCheckForSuccess(t *testing.T, client *ManagementClient, agent
 		return err
 	}
 	if !assert.False(t, agentExists(agent, agents), "created agent was found in list of agents") {
-		return errors.New("assertion failed!")
+		return errors.New("assertion failed")
 	}
 	return nil
 }
@@ -1254,7 +1254,7 @@ func addEngineToAgentAndCheckForSuccess(t *testing.T, client *ManagementClient, 
 		return err
 	}
 	if !assert.True(t, isEngineInAgent(agent, engine), "engine was successfully added to an agent, but cannot be found in the agents engine list") {
-		return errors.New("assertion failed!")
+		return errors.New("assertion failed")
 	}
 	return nil
 }
@@ -1270,7 +1270,7 @@ func removeEngineFromAgentAndCheckForSuccess(t *testing.T, client *ManagementCli
 		return err
 	}
 	if !assert.False(t, isEngineInAgent(agent, engine), "engine is still in agent after successfully removing it") {
-		return errors.New("assertion failed!")
+		return errors.New("assertion failed")
 	}
 	return nil
 }
@@ -1291,7 +1291,7 @@ func createLabAndCheckForSuccess(t *testing.T, client *ManagementClient, name st
 		return Lab{}, err
 	}
 	if !assert.True(t, labsExists(lab, labs), "created lab was not found in list of labs") {
-		return Lab{}, errors.New("assertion failed!")
+		return Lab{}, errors.New("assertion failed")
 	}
 	return lab, nil
 }
@@ -1323,7 +1323,7 @@ func addAgentToLabAndCheckForSuccess(t *testing.T, client *ManagementClient, lab
 		return err
 	}
 	if !assert.True(t, isAgentInLab(lab, agent), "agent was successfully added to an lab, but cannot be found in the labs agent list") {
-		return errors.New("assertion failed!")
+		return errors.New("assertion failed")
 	}
 	return nil
 }
@@ -1339,7 +1339,7 @@ func removeAgentFromLabAndCheckForSuccess(t *testing.T, client *ManagementClient
 		return err
 	}
 	if !assert.False(t, isAgentInLab(lab, agent), "agent is still in lab after successfully removing it") {
-		return errors.New("assertion failed!")
+		return errors.New("assertion failed")
 	}
 	return nil
 }
@@ -1358,7 +1358,7 @@ func setLabPowerAndCheckForSuccess(t *testing.T, client *ManagementClient, lab L
 		return err
 	}
 	if !assert.True(t, lab.Power == power, `lab power is not "`+power+`" after successfully setting it to "`+power+`"`) {
-		return errors.New("assertion failed!")
+		return errors.New("assertion failed")
 	}
 	return nil
 }
@@ -1380,7 +1380,7 @@ func createEngineAndCheckForSuccess(t *testing.T, client *ManagementClient, name
 		return Engine{}, err
 	}
 	if !assert.True(t, engineExist(engine, engines), "created engine was not found in list of engines") {
-		return Engine{}, errors.New("assertion failed!")
+		return Engine{}, errors.New("assertion failed")
 	}
 	return engine, nil
 }
@@ -1412,7 +1412,7 @@ func addUserToEngineAndCheckForSuccess(t *testing.T, client *ManagementClient, e
 		return err
 	}
 	if !assert.True(t, isUserInEngine(engine, user), "user was successfully added to an engine, but cannot be found in the engines user list") {
-		return errors.New("assertion failed!")
+		return errors.New("assertion failed")
 	}
 	return nil
 }
@@ -1428,7 +1428,7 @@ func removeUserFromEngineAndCheckForSuccess(t *testing.T, client *ManagementClie
 		return err
 	}
 	if !assert.False(t, isUserInEngine(engine, user), "user is still in engine after successfully removing it") {
-		return errors.New("assertion failed!")
+		return errors.New("assertion failed")
 	}
 	return nil
 }
@@ -1445,7 +1445,7 @@ func addEndpointToEngineAndCheckForSuccess(t *testing.T, client *ManagementClien
 		return err
 	}
 	if !assert.True(t, isEndpointInEngine(engine, endpoint), "endpoint was successfully added to an engine, but cannot be found in the engines endpoint list") {
-		return errors.New("assertion failed!")
+		return errors.New("assertion failed")
 	}
 	return nil
 }
@@ -1461,7 +1461,7 @@ func removeEndpointFromEngineAndCheckForSuccess(t *testing.T, client *Management
 		return err
 	}
 	if !assert.False(t, isEndpointInEngine(engine, endpoint), "endpoint is still in engine after successfully removing it") {
-		return errors.New("assertion failed!")
+		return errors.New("assertion failed")
 	}
 	return nil
 }
@@ -1483,7 +1483,7 @@ func createEndpointAndCheckForSuccess(t *testing.T, client *ManagementClient, na
 	}
 
 	if !assert.True(t, endpointExist(endpoint, endpoints), "created endpoint was not found in list of endpoints") {
-		return Endpoint{}, errors.New("assertion failed!")
+		return Endpoint{}, errors.New("assertion failed")
 	}
 	return endpoint, nil
 }
@@ -1520,7 +1520,7 @@ func createUserAndCheckForSuccess(t *testing.T, client *ManagementClient, userId
 	}
 
 	if !assert.True(t, userExist(user, users), "created user was not found in list of users") {
-		return User{}, errors.New("assertion failed!")
+		return User{}, errors.New("assertion failed")
 	}
 	return user, nil
 }

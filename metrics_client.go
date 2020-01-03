@@ -1,4 +1,4 @@
-package snmpsim_restapi_client
+package snmpsimclient
 
 import (
 	"encoding/json"
@@ -33,7 +33,7 @@ func NewMetricsClient(baseUrl string) (*MetricsClient, error) {
 GetProcessesMetrics returns process metrics.
 */
 func (c *MetricsClient) GetProcessesMetrics(filters map[string]string) (ProcessesMetrics, error) {
-	response, err := c.request("GET", METRICS_ENDPOINT_PATH+"processes", "", nil, filters)
+	response, err := c.request("GET", metricsEndpointPath+"processes", "", nil, filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "error during request")
 	}
@@ -52,7 +52,7 @@ func (c *MetricsClient) GetProcessesMetrics(filters map[string]string) (Processe
 GetPacketMetrics returns packet metrics.
 */
 func (c *MetricsClient) GetPacketMetrics(filters map[string]string) (PacketMetrics, error) {
-	response, err := c.request("GET", METRICS_ENDPOINT_PATH+"activity/packets", "", nil, filters)
+	response, err := c.request("GET", metricsEndpointPath+"activity/packets", "", nil, filters)
 	if err != nil {
 		return PacketMetrics{}, errors.Wrap(err, "error during request")
 	}
@@ -71,7 +71,7 @@ func (c *MetricsClient) GetPacketMetrics(filters map[string]string) (PacketMetri
 GetPacketFilters returns all packet filters.
 */
 func (c *MetricsClient) GetPacketFilters() (map[string]string, error) {
-	response, err := c.request("GET", METRICS_ENDPOINT_PATH+"activity/packets/filters", "", nil, nil)
+	response, err := c.request("GET", metricsEndpointPath+"activity/packets/filters", "", nil, nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "error during request")
 	}
@@ -91,7 +91,7 @@ func (c *MetricsClient) GetPacketFilters() (map[string]string, error) {
 GetMessageMetrics returns message metrics.
 */
 func (c *MetricsClient) GetMessageMetrics(filters map[string]string) (MessageMetrics, error) {
-	response, err := c.request("GET", METRICS_ENDPOINT_PATH+"activity/messages", "", nil, filters)
+	response, err := c.request("GET", metricsEndpointPath+"activity/messages", "", nil, filters)
 	if err != nil {
 		return MessageMetrics{}, errors.Wrap(err, "error during request")
 	}
@@ -110,7 +110,7 @@ func (c *MetricsClient) GetMessageMetrics(filters map[string]string) (MessageMet
 GetMessageFilters returns all message filters.
 */
 func (c *MetricsClient) GetMessageFilters() (map[string]string, error) {
-	response, err := c.request("GET", METRICS_ENDPOINT_PATH+"activity/messages/filters", "", nil, nil)
+	response, err := c.request("GET", metricsEndpointPath+"activity/messages/filters", "", nil, nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "error during request")
 	}

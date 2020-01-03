@@ -1,4 +1,4 @@
-package snmpsim_restapi_client
+package snmpsimclient
 
 import (
 	"encoding/json"
@@ -10,8 +10,10 @@ import (
 )
 
 const (
-	MGMT_ENDPOINT_PATH    = "snmpsim/mgmt/v1/"
-	METRICS_ENDPOINT_PATH = "snmpsim/metrics/v1/"
+	// mgmtEndpointPath path to the mgmt api endpoint
+	mgmtEndpointPath = "snmpsim/mgmt/v1/"
+	// metricsEndpointPath path to the metrics api endpoint
+	metricsEndpointPath = "snmpsim/metrics/v1/"
 )
 
 type client struct {

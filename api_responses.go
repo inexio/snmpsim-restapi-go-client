@@ -1,4 +1,4 @@
-package snmpsim_restapi_client
+package snmpsimclient
 
 /*
 Labs is an array of Labs.
@@ -38,7 +38,7 @@ Agents is an array of agents.
 type Agents []Agent
 
 /*
-Agents - Represents SNMP agent. Consists of SNMP engine and transport endpoints it binds.
+Agent - Represents SNMP agent. Consists of SNMP engine and transport endpoints it binds.
 */
 type Agent struct {
 	Id        int       `json:"id"`
@@ -102,6 +102,7 @@ type User struct {
 //TODO: not implemented int the api yet, there is only one default selector for snmpv2c and one for snmpv3.
 // We have to wait with the implementation until its implemented in the api.
 // The strucuture is like this in the api doc but it might be different in the real api, this has to be checked first before it can be used.
+
 /*
 Selectors is an array of selectors.
 */

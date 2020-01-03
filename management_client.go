@@ -1,4 +1,4 @@
-package snmpsim_restapi_client
+package snmpsimclient
 
 import (
 	"encoding/json"
@@ -45,7 +45,7 @@ func (c *ManagementClient) GetLabs() (Labs, error) {
 		return nil, &NotValidError{}
 	}
 
-	response, err := c.request("GET", MGMT_ENDPOINT_PATH+"labs", "", nil, nil)
+	response, err := c.request("GET", mgmtEndpointPath+"labs", "", nil, nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "error during get labs request")
 	}
@@ -69,7 +69,7 @@ func (c *ManagementClient) GetLab(id int) (Lab, error) {
 		return Lab{}, &NotValidError{}
 	}
 
-	response, err := c.request("GET", MGMT_ENDPOINT_PATH+"labs/"+strconv.Itoa(id), "", nil, nil)
+	response, err := c.request("GET", mgmtEndpointPath+"labs/"+strconv.Itoa(id), "", nil, nil)
 	if err != nil {
 		return Lab{}, errors.Wrap(err, "error during get labs request")
 	}
@@ -97,7 +97,7 @@ func (c *ManagementClient) CreateLab(name string) (Lab, error) {
 		return Lab{}, errors.New("invalid name")
 	}
 
-	response, err := c.request("POST", MGMT_ENDPOINT_PATH+"labs", `{"name":"`+name+`"}`, nil, nil)
+	response, err := c.request("POST", mgmtEndpointPath+"labs", `{"name":"`+name+`"}`, nil, nil)
 
 	if err != nil {
 		return Lab{}, errors.Wrap(err, "error during add lab request")
@@ -122,7 +122,7 @@ func (c *ManagementClient) DeleteLab(id int) error {
 		return &NotValidError{}
 	}
 
-	response, err := c.request("DELETE", MGMT_ENDPOINT_PATH+"labs/"+strconv.Itoa(id), "", nil, nil)
+	response, err := c.request("DELETE", mgmtEndpointPath+"labs/"+strconv.Itoa(id), "", nil, nil)
 	if err != nil {
 		return errors.Wrap(err, "error during request")
 	}
@@ -140,7 +140,7 @@ func (c *ManagementClient) AddAgentToLab(labId, agentId int) error {
 		return &NotValidError{}
 	}
 
-	response, err := c.request("PUT", MGMT_ENDPOINT_PATH+"labs/"+strconv.Itoa(labId)+"/agent/"+strconv.Itoa(agentId), "", nil, nil)
+	response, err := c.request("PUT", mgmtEndpointPath+"labs/"+strconv.Itoa(labId)+"/agent/"+strconv.Itoa(agentId), "", nil, nil)
 	if err != nil {
 		return errors.Wrap(err, "error during request")
 	}
@@ -159,7 +159,7 @@ func (c *ManagementClient) RemoveAgentFromLab(labId, agentId int) error {
 		return &NotValidError{}
 	}
 
-	response, err := c.request("DELETE", MGMT_ENDPOINT_PATH+"labs/"+strconv.Itoa(labId)+"/agent/"+strconv.Itoa(agentId), "", nil, nil)
+	response, err := c.request("DELETE", mgmtEndpointPath+"labs/"+strconv.Itoa(labId)+"/agent/"+strconv.Itoa(agentId), "", nil, nil)
 	if err != nil {
 		return errors.Wrap(err, "error during request")
 	}
@@ -186,7 +186,7 @@ func (c *ManagementClient) SetLabPower(labId int, power bool) error {
 		labPowerState = "off"
 	}
 
-	response, err := c.request("PUT", MGMT_ENDPOINT_PATH+"labs/"+strconv.Itoa(labId)+"/power/"+labPowerState, "", nil, nil)
+	response, err := c.request("PUT", mgmtEndpointPath+"labs/"+strconv.Itoa(labId)+"/power/"+labPowerState, "", nil, nil)
 	if err != nil {
 		return errors.Wrap(err, "error during request")
 	}
@@ -210,7 +210,7 @@ func (c *ManagementClient) GetEngines() (Engines, error) {
 		return nil, &NotValidError{}
 	}
 
-	response, err := c.request("GET", MGMT_ENDPOINT_PATH+"engines", "", nil, nil)
+	response, err := c.request("GET", mgmtEndpointPath+"engines", "", nil, nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "error during get labs request")
 	}
@@ -234,7 +234,7 @@ func (c *ManagementClient) GetEngine(id int) (Engine, error) {
 		return Engine{}, &NotValidError{}
 	}
 
-	response, err := c.request("GET", MGMT_ENDPOINT_PATH+"engines/"+strconv.Itoa(id), "", nil, nil)
+	response, err := c.request("GET", mgmtEndpointPath+"engines/"+strconv.Itoa(id), "", nil, nil)
 	if err != nil {
 		return Engine{}, errors.Wrap(err, "error during get labs request")
 	}
@@ -277,7 +277,7 @@ func (c *ManagementClient) CreateEngine(name, engineId string) (Engine, error) {
 		return Engine{}, errors.Wrap(err, "error during marshal")
 	}
 
-	response, err := c.request("POST", MGMT_ENDPOINT_PATH+"engines", string(jsonString), nil, nil)
+	response, err := c.request("POST", mgmtEndpointPath+"engines", string(jsonString), nil, nil)
 	if err != nil {
 		return Engine{}, errors.Wrap(err, "error during request")
 	}
@@ -300,7 +300,7 @@ func (c *ManagementClient) DeleteEngine(id int) error {
 		return &NotValidError{}
 	}
 
-	response, err := c.request("DELETE", MGMT_ENDPOINT_PATH+"engines/"+strconv.Itoa(id), "", nil, nil)
+	response, err := c.request("DELETE", mgmtEndpointPath+"engines/"+strconv.Itoa(id), "", nil, nil)
 	if err != nil {
 		return errors.Wrap(err, "error during request")
 	}
@@ -318,7 +318,7 @@ func (c *ManagementClient) AddUserToEngine(engineId, userId int) error {
 		return &NotValidError{}
 	}
 
-	response, err := c.request("PUT", MGMT_ENDPOINT_PATH+"engines/"+strconv.Itoa(engineId)+"/user/"+strconv.Itoa(userId), "", nil, nil)
+	response, err := c.request("PUT", mgmtEndpointPath+"engines/"+strconv.Itoa(engineId)+"/user/"+strconv.Itoa(userId), "", nil, nil)
 	if err != nil {
 		return errors.Wrap(err, "error during request")
 	}
@@ -338,7 +338,7 @@ func (c *ManagementClient) RemoveUserFromEngine(engineId, userId int) error {
 		return &NotValidError{}
 	}
 
-	response, err := c.request("DELETE", MGMT_ENDPOINT_PATH+"engines/"+strconv.Itoa(engineId)+"/user/"+strconv.Itoa(userId), "", nil, nil)
+	response, err := c.request("DELETE", mgmtEndpointPath+"engines/"+strconv.Itoa(engineId)+"/user/"+strconv.Itoa(userId), "", nil, nil)
 	if err != nil {
 		return errors.Wrap(err, "error during request")
 	}
@@ -358,7 +358,7 @@ func (c *ManagementClient) AddEndpointToEngine(engineId, endpointId int) error {
 		return &NotValidError{}
 	}
 
-	response, err := c.request("PUT", MGMT_ENDPOINT_PATH+"engines/"+strconv.Itoa(engineId)+"/endpoint/"+strconv.Itoa(endpointId), "", nil, nil)
+	response, err := c.request("PUT", mgmtEndpointPath+"engines/"+strconv.Itoa(engineId)+"/endpoint/"+strconv.Itoa(endpointId), "", nil, nil)
 	if err != nil {
 		return errors.Wrap(err, "error during request")
 	}
@@ -378,7 +378,7 @@ func (c *ManagementClient) RemoveEndpointFromEngine(engineId, endpointId int) er
 		return &NotValidError{}
 	}
 
-	response, err := c.request("DELETE", MGMT_ENDPOINT_PATH+"engines/"+strconv.Itoa(engineId)+"/endpoint/"+strconv.Itoa(endpointId), "", nil, nil)
+	response, err := c.request("DELETE", mgmtEndpointPath+"engines/"+strconv.Itoa(engineId)+"/endpoint/"+strconv.Itoa(endpointId), "", nil, nil)
 	if err != nil {
 		return errors.Wrap(err, "error during request")
 	}
@@ -401,7 +401,7 @@ func (c *ManagementClient) GetAgents() (Agents, error) {
 		return nil, &NotValidError{}
 	}
 
-	response, err := c.request("GET", MGMT_ENDPOINT_PATH+"agents", "", nil, nil)
+	response, err := c.request("GET", mgmtEndpointPath+"agents", "", nil, nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "error during get labs request")
 	}
@@ -425,7 +425,7 @@ func (c *ManagementClient) GetAgent(id int) (Agent, error) {
 		return Agent{}, &NotValidError{}
 	}
 
-	response, err := c.request("GET", MGMT_ENDPOINT_PATH+"agents/"+strconv.Itoa(id), "", nil, nil)
+	response, err := c.request("GET", mgmtEndpointPath+"agents/"+strconv.Itoa(id), "", nil, nil)
 	if err != nil {
 		return Agent{}, errors.Wrap(err, "error during get labs request")
 	}
@@ -468,7 +468,7 @@ func (c *ManagementClient) CreateAgent(name, dataDir string) (Agent, error) {
 		return Agent{}, errors.Wrap(err, "error during marshal")
 	}
 
-	response, err := c.request("POST", MGMT_ENDPOINT_PATH+"agents", string(jsonString), nil, nil)
+	response, err := c.request("POST", mgmtEndpointPath+"agents", string(jsonString), nil, nil)
 	if err != nil {
 		return Agent{}, errors.Wrap(err, "error during request")
 	}
@@ -492,7 +492,7 @@ func (c *ManagementClient) DeleteAgent(id int) error {
 		return &NotValidError{}
 	}
 
-	response, err := c.request("DELETE", MGMT_ENDPOINT_PATH+"agents/"+strconv.Itoa(id), "", nil, nil)
+	response, err := c.request("DELETE", mgmtEndpointPath+"agents/"+strconv.Itoa(id), "", nil, nil)
 	if err != nil {
 		return errors.Wrap(err, "error during request")
 	}
@@ -510,7 +510,7 @@ func (c *ManagementClient) AddEngineToAgent(agentId, engineId int) error {
 		return &NotValidError{}
 	}
 
-	response, err := c.request("PUT", MGMT_ENDPOINT_PATH+"agents/"+strconv.Itoa(agentId)+"/engine/"+strconv.Itoa(engineId), "", nil, nil)
+	response, err := c.request("PUT", mgmtEndpointPath+"agents/"+strconv.Itoa(agentId)+"/engine/"+strconv.Itoa(engineId), "", nil, nil)
 	if err != nil {
 		return errors.Wrap(err, "error during request")
 	}
@@ -530,7 +530,7 @@ func (c *ManagementClient) RemoveEngineFromAgent(agentId, engineId int) error {
 		return &NotValidError{}
 	}
 
-	response, err := c.request("DELETE", MGMT_ENDPOINT_PATH+"agents/"+strconv.Itoa(agentId)+"/engine/"+strconv.Itoa(engineId), "", nil, nil)
+	response, err := c.request("DELETE", mgmtEndpointPath+"agents/"+strconv.Itoa(agentId)+"/engine/"+strconv.Itoa(engineId), "", nil, nil)
 	if err != nil {
 		return errors.Wrap(err, "error during request")
 	}
@@ -547,7 +547,7 @@ AddSelectorToAgent adds a Selector to an Agent.
 */
 func (c *ManagementClient) AddSelectorToAgent(agentId, selectorId int) (Agent, error) {
 	//TODO: Not implemented yet!!! Selectors are not implemented yet, see SELECTORS section
-	return Agent{}, errors.New("Not implemented yet!")
+	return Agent{}, errors.New("Not implemented yet")
 }
 
 /*
@@ -555,7 +555,7 @@ RemoveSelectorFromAgent removes a Selector from an Agent.
 */
 func (c *ManagementClient) RemoveSelectorFromAgent(agentId, selectorId int) (Agent, error) {
 	//TODO: Not implemented yet!!! Selectors are not implemented yet, see SELECTORS section
-	return Agent{}, errors.New("Not implemented yet!")
+	return Agent{}, errors.New("Not implemented yet")
 }
 
 /*
@@ -570,7 +570,7 @@ func (c *ManagementClient) GetEndpoints() (Endpoints, error) {
 		return nil, &NotValidError{}
 	}
 
-	response, err := c.request("GET", MGMT_ENDPOINT_PATH+"endpoints", "", nil, nil)
+	response, err := c.request("GET", mgmtEndpointPath+"endpoints", "", nil, nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "error during get labs request")
 	}
@@ -594,7 +594,7 @@ func (c *ManagementClient) GetEndpoint(id int) (Endpoint, error) {
 		return Endpoint{}, &NotValidError{}
 	}
 
-	response, err := c.request("GET", MGMT_ENDPOINT_PATH+"endpoints/"+strconv.Itoa(id), "", nil, nil)
+	response, err := c.request("GET", mgmtEndpointPath+"endpoints/"+strconv.Itoa(id), "", nil, nil)
 	if err != nil {
 		return Endpoint{}, errors.Wrap(err, "error during get labs request")
 	}
@@ -642,7 +642,7 @@ func (c *ManagementClient) CreateEndpoint(name, address, protocol string) (Endpo
 		return Endpoint{}, errors.Wrap(err, "error during marshal")
 	}
 
-	response, err := c.request("POST", MGMT_ENDPOINT_PATH+"endpoints", string(jsonString), nil, nil)
+	response, err := c.request("POST", mgmtEndpointPath+"endpoints", string(jsonString), nil, nil)
 
 	if err != nil {
 		return Endpoint{}, errors.Wrap(err, "error during request")
@@ -667,7 +667,7 @@ func (c *ManagementClient) DeleteEndpoint(id int) error {
 		return &NotValidError{}
 	}
 
-	response, err := c.request("DELETE", MGMT_ENDPOINT_PATH+"endpoints/"+strconv.Itoa(id), "", nil, nil)
+	response, err := c.request("DELETE", mgmtEndpointPath+"endpoints/"+strconv.Itoa(id), "", nil, nil)
 	if err != nil {
 		return errors.Wrap(err, "error during request")
 	}
@@ -680,6 +680,7 @@ func (c *ManagementClient) DeleteEndpoint(id int) error {
 /*
 RECORD FILES
 */
+
 /*
 GetRecordFiles returns a list of all record files.
 */
@@ -688,7 +689,7 @@ func (c *ManagementClient) GetRecordFiles() (Recordings, error) {
 		return nil, &NotValidError{}
 	}
 
-	response, err := c.request("GET", MGMT_ENDPOINT_PATH+"recordings", "", nil, nil)
+	response, err := c.request("GET", mgmtEndpointPath+"recordings", "", nil, nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "error during get labs request")
 	}
@@ -721,12 +722,12 @@ func (c *ManagementClient) UploadRecordFile(localPath, remotePath string) error 
 }
 
 /*
-UploadRecordFile uploads the given record data to the api and saves it as a .snmprec file at the given remote path inside of the data dir.
+UploadRecordFileString uploads the given record data to the api and saves it as a .snmprec file at the given remote path inside of the data dir.
 */
 func (c *ManagementClient) UploadRecordFileString(recordContents *string, remotePath string) error {
 	headerMap := make(map[string]string)
 	headerMap["Content-Type"] = "text/plain"
-	response, err := c.request("POST", MGMT_ENDPOINT_PATH+"recordings/"+remotePath, *recordContents, headerMap, nil)
+	response, err := c.request("POST", mgmtEndpointPath+"recordings/"+remotePath, *recordContents, headerMap, nil)
 	if err != nil {
 		return errors.Wrap(err, "error during request")
 	}
@@ -746,7 +747,7 @@ func (c *ManagementClient) DeleteRecordFile(remotePath string) error {
 	}
 	headerMap := make(map[string]string)
 	headerMap["Content-Type"] = "text/plain"
-	response, err := c.request("DELETE", MGMT_ENDPOINT_PATH+"recordings/"+remotePath, "", headerMap, nil)
+	response, err := c.request("DELETE", mgmtEndpointPath+"recordings/"+remotePath, "", headerMap, nil)
 	if err != nil {
 		return errors.Wrap(err, "error during request")
 	}
@@ -766,7 +767,7 @@ func (c *ManagementClient) GetRecordFile(remotePath string) (string, error) {
 	}
 	headerMap := make(map[string]string)
 	headerMap["Content-Type"] = "text/plain"
-	response, err := c.request("GET", MGMT_ENDPOINT_PATH+"recordings/"+remotePath, "", headerMap, nil)
+	response, err := c.request("GET", mgmtEndpointPath+"recordings/"+remotePath, "", headerMap, nil)
 	if err != nil {
 		return "", errors.Wrap(err, "error during request")
 	}
@@ -836,7 +837,7 @@ func (c *ManagementClient) CreateUser(user, name, authKey, authProto, privKey, p
 		return User{}, errors.Wrap(err, "error during marshal")
 	}
 
-	response, err := c.request("POST", MGMT_ENDPOINT_PATH+"users", string(jsonString), nil, nil)
+	response, err := c.request("POST", mgmtEndpointPath+"users", string(jsonString), nil, nil)
 	if err != nil {
 		return User{}, errors.Wrap(err, "error during request")
 	}
@@ -860,7 +861,7 @@ func (c *ManagementClient) GetUsers() (Users, error) {
 		return nil, &NotValidError{}
 	}
 
-	response, err := c.request("GET", MGMT_ENDPOINT_PATH+"users", "", nil, nil)
+	response, err := c.request("GET", mgmtEndpointPath+"users", "", nil, nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "error during get labs request")
 	}
@@ -884,7 +885,7 @@ func (c *ManagementClient) GetUser(id int) (User, error) {
 		return User{}, &NotValidError{}
 	}
 
-	response, err := c.request("GET", MGMT_ENDPOINT_PATH+"users/"+strconv.Itoa(id), "", nil, nil)
+	response, err := c.request("GET", mgmtEndpointPath+"users/"+strconv.Itoa(id), "", nil, nil)
 	if err != nil {
 		return User{}, errors.Wrap(err, "error during get labs request")
 	}
@@ -908,7 +909,7 @@ func (c *ManagementClient) DeleteUser(id int) error {
 		return &NotValidError{}
 	}
 
-	response, err := c.request("DELETE", MGMT_ENDPOINT_PATH+"users/"+strconv.Itoa(id), "", nil, nil)
+	response, err := c.request("DELETE", mgmtEndpointPath+"users/"+strconv.Itoa(id), "", nil, nil)
 	if err != nil {
 		return errors.Wrap(err, "error during request")
 	}
@@ -928,7 +929,7 @@ CreateSelector creates a new selector.
 */
 func (c *ManagementClient) CreateSelector(comment, template string) (Selector, error) {
 	//TODO: Not implemented yet!!! This also isnt implemented in the api so we have to wait until its ready.
-	return Selector{}, errors.New("Not implemented yet!")
+	return Selector{}, errors.New("Not implemented yet")
 }
 
 /*
@@ -936,7 +937,7 @@ GetSelectors returns a list of all selectors.
 */
 func (c *ManagementClient) GetSelectors() (Selectors, error) {
 	//TODO: Not implemented yet!!! This also isnt implemented in the api so we have to wait until its ready.
-	return nil, errors.New("Not implemented yet!")
+	return nil, errors.New("Not implemented yet")
 }
 
 /*
@@ -944,7 +945,7 @@ GetSelector returns the selector with the given id.
 */
 func (c *ManagementClient) GetSelector(id int) (Selector, error) {
 	//TODO: Not implemented yet!!! This also isnt implemented in the api so we have to wait until its ready.
-	return Selector{}, errors.New("Not implemented yet!")
+	return Selector{}, errors.New("Not implemented yet")
 }
 
 /*
@@ -952,5 +953,5 @@ DeleteSelector deletes the selector with the given id.
 */
 func (c *ManagementClient) DeleteSelector(id int) error {
 	//TODO: Not implemented yet!!! This also isnt implemented in the api so we have to wait until its ready.
-	return errors.New("Not implemented yet!")
+	return errors.New("Not implemented yet")
 }
