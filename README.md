@@ -4,3 +4,5 @@
 
 ## Description
 Golang package - client library for the [snmpsim](https://github.com/etingof/snmpsim) [REST API](https://github.com/etingof/snmpsim-control-plane).
+
+The library is used by [snmpsim-control-client](https://github.com/inexio/snmpsim-control-client) and [snmpsim-check](https://github.com/inexio/snmpsim-check).
