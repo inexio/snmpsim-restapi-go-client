@@ -1,0 +1,13 @@
+baseUrl: "http://192.168.100.203:8001/"
+HttpAuthUsername: ""
+HttpAuthPassword: ""
+
+protocol: "udpv4"
+
+agent1:
+  endpointAddress: "192.168.100.203"
+  endpointPort:
+    - 6668
+    - 7000
+
+rootDataDir: "metrics-api-test/"

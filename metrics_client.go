@@ -88,6 +88,26 @@ func (c *MetricsClient) GetPacketFilters() (map[string]string, error) {
 }
 
 /*
+GetPossibleValuesForPacketFilter returns a list of all values that can be used for the given filter.
+*/
+func (c *MetricsClient) GetPossibleValuesForPacketFilter(filter string) ([]string, error) {
+	response, err := c.request("GET", metricsEndpointPath+"activity/packets/filters/"+filter, "", nil, nil)
+	if err != nil {
+		return nil, errors.Wrap(err, "error during request")
+	}
+	if response.StatusCode() != 200 {
+		return nil, getHttpError(response)
+	}
+
+	var messageFilters []string
+	err = json.Unmarshal(response.Body(), &messageFilters)
+	if err != nil {
+		return nil, errors.Wrap(err, "error during unmarshalling http response")
+	}
+	return messageFilters, nil
+}
+
+/*
 GetMessageMetrics returns message metrics.
 */
 func (c *MetricsClient) GetMessageMetrics(filters map[string]string) (MessageMetrics, error) {
@@ -119,6 +139,26 @@ func (c *MetricsClient) GetMessageFilters() (map[string]string, error) {
 	}
 
 	var messageFilters map[string]string
+	err = json.Unmarshal(response.Body(), &messageFilters)
+	if err != nil {
+		return nil, errors.Wrap(err, "error during unmarshalling http response")
+	}
+	return messageFilters, nil
+}
+
+/*
+GetPossibleValuesForMessageFilter returns a list of all values that can be used for the given filter.
+*/
+func (c *MetricsClient) GetPossibleValuesForMessageFilter(filter string) ([]string, error) {
+	response, err := c.request("GET", metricsEndpointPath+"activity/messages/filters/"+filter, "", nil, nil)
+	if err != nil {
+		return nil, errors.Wrap(err, "error during request")
+	}
+	if response.StatusCode() != 200 {
+		return nil, getHttpError(response)
+	}
+
+	var messageFilters []string
 	err = json.Unmarshal(response.Body(), &messageFilters)
 	if err != nil {
 		return nil, errors.Wrap(err, "error during unmarshalling http response")

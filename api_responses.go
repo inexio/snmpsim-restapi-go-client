@@ -175,12 +175,12 @@ type PacketMetrics struct {
 MessageMetrics - SNMP message level metrics.
 */
 type MessageMetrics struct {
-	FirstHit   *int          `json:"first_hit"`
-	LastHit    *int          `json:"last_hit"`
-	Pdus       *int64        `json:"pdus"`
-	VarBinds   *int64        `json:"var_binds"`
-	Failures   *int64        `json:"failures"`
-	Variations []interface{} `json:"variations"`
+	FirstHit   *int       `json:"first_hit"`
+	LastHit    *int       `json:"last_hit"`
+	Pdus       *int64     `json:"pdus"`
+	VarBinds   *int64     `json:"var_binds"`
+	Failures   *int64     `json:"failures"`
+	Variations Variations `json:"variations"`
 }
 
 /*
