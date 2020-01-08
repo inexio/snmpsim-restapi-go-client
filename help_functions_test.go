@@ -5,6 +5,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
+	"strings"
 	"os"
 	"path"
 	"runtime"
@@ -16,27 +17,29 @@ type agentData struct {
 	EndpointPort    []int  `mapstructure:"endpointPort"`
 }
 
+type httpConfig struct {
+	BaseUrl         string    `mapstructure:"baseUrl"`
+	AuthUsername 	string    `mapstructure:"authUsername"`
+	AuthPassword 	string    `mapstructure:"authPassword"`
+}
+
 type configMetricsApiTest struct {
-	BaseUrl          string    `mapstructure:"baseUrl"`
-	HttpAuthUsername string    `mapstructure:"httpAuthUsername"`
-	HttpAuthPassword string    `mapstructure:"httpAuthPassword"`
-	Protocol         string    `mapstructure:"protocol"`
-	Agent1           agentData `mapstructure:"agent1"`
-	RootDataDir      string    `mapstructure:"rootDataDir"`
-	TestDataDir      string
+	Http            httpConfig	`mapstructure:"http"`
+	Protocol        string    	`mapstructure:"protocol"`
+	Agent1          agentData 	`mapstructure:"agent1"`
+	RootDataDir     string    	`mapstructure:"rootDataDir"`
+	TestDataDir     string
 }
 
 var configMetricsTest configMetricsApiTest
 
 type configManagementApiTest struct {
-	BaseUrl          string    `mapstructure:"baseUrl"`
-	HttpAuthUsername string    `mapstructure:"httpAuthUsername"`
-	HttpAuthPassword string    `mapstructure:"httpAuthPassword"`
-	Protocol         string    `mapstructure:"protocol"`
-	Agent1           agentData `mapstructure:"agent1"`
-	Agent2           agentData `mapstructure:"agent2"`
-	RootDataDir      string    `mapstructure:"rootDataDir"`
-	TestDataDir      string
+	Http            httpConfig	`mapstructure:"http"`
+	Protocol        string    	`mapstructure:"protocol"`
+	Agent1          agentData 	`mapstructure:"agent1"`
+	Agent2          agentData 	`mapstructure:"agent2"`
+	RootDataDir     string    	`mapstructure:"rootDataDir"`
+	TestDataDir     string
 }
 
 var configManagementTest configManagementApiTest
@@ -49,6 +52,8 @@ func init() {
 	viperManagement := viper.New()
 	viperManagement.SetConfigFile(testDataDir + "management-api-test-config.yaml")
 	viperManagement.SetEnvPrefix("snmpsim_management_api_test")
+	replacer := strings.NewReplacer(".", "_")
+	viperManagement.SetEnvKeyReplacer(replacer)
 	viperManagement.AutomaticEnv()
 
 	err := viperManagement.ReadInConfig()

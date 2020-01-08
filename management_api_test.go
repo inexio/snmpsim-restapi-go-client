@@ -49,13 +49,13 @@ func TestManagementClient_buildUpSetupAndTestIt(t *testing.T) {
 	remoteRecordFilePath2 := agentDataDir2 + "/" + community + ".snmprec"
 
 	//Create a new api client
-	client, err := NewManagementClient(configManagementTest.BaseUrl)
+	client, err := NewManagementClient(configManagementTest.Http.BaseUrl)
 	if !assert.NoError(t, err, "error while creating a new api client") {
 		return
 	}
-	//Set configManagementTest.HttpAuthUsername and password
-	if configManagementTest.HttpAuthUsername != "" && configManagementTest.HttpAuthPassword != "" {
-		err = client.SetUsernameAndPassword(configManagementTest.HttpAuthUsername, configManagementTest.HttpAuthPassword)
+	//Set configManagementTest.Http.AuthUsername and password
+	if configManagementTest.Http.AuthUsername != "" && configManagementTest.Http.AuthPassword != "" {
+		err = client.SetUsernameAndPassword(configManagementTest.Http.AuthUsername, configManagementTest.Http.AuthPassword)
 		if !assert.NoError(t, err, "error while creating a new api client") {
 			return
 		}
@@ -426,13 +426,13 @@ func TestManagementClient_UploadRecordFileString_DeleteRecordFile(t *testing.T) 
 	remotePathFile2 := "test-UploadRecordFileString_DeleteRecordFile/dir1/public.snmprec"
 
 	//Create a new api client
-	client, err := NewManagementClient(configManagementTest.BaseUrl)
+	client, err := NewManagementClient(configManagementTest.Http.BaseUrl)
 	if !assert.NoError(t, err, "error while creating a new api client") {
 		return
 	}
-	//Set configManagementTest.HttpAuthUsername and password
-	if configManagementTest.HttpAuthUsername != "" && configManagementTest.HttpAuthPassword != "" {
-		err = client.SetUsernameAndPassword(configManagementTest.HttpAuthUsername, configManagementTest.HttpAuthPassword)
+	//Set configManagementTest.Http.AuthUsername and password
+	if configManagementTest.Http.AuthUsername != "" && configManagementTest.Http.AuthPassword != "" {
+		err = client.SetUsernameAndPassword(configManagementTest.Http.AuthUsername, configManagementTest.Http.AuthPassword)
 		if !assert.NoError(t, err, "error while creating a new api client") {
 			return
 		}
@@ -495,13 +495,13 @@ func TestManagementClient_UploadRecordFileString_DeleteRecordFile(t *testing.T) 
 
 func TestManagementClient_Agent_Failures(t *testing.T) {
 	//Create a new api client
-	client, err := NewManagementClient(configManagementTest.BaseUrl)
+	client, err := NewManagementClient(configManagementTest.Http.BaseUrl)
 	if !assert.NoError(t, err, "error while creating a new api client") {
 		return
 	}
-	//Set configManagementTest.HttpAuthUsername and password
-	if configManagementTest.HttpAuthUsername != "" && configManagementTest.HttpAuthPassword != "" {
-		err = client.SetUsernameAndPassword(configManagementTest.HttpAuthUsername, configManagementTest.HttpAuthPassword)
+	//Set configManagementTest.Http.AuthUsername and password
+	if configManagementTest.Http.AuthUsername != "" && configManagementTest.Http.AuthPassword != "" {
+		err = client.SetUsernameAndPassword(configManagementTest.Http.AuthUsername, configManagementTest.Http.AuthPassword)
 		if !assert.NoError(t, err, "error while creating a new api client") {
 			return
 		}
@@ -620,13 +620,13 @@ func TestManagementClient_Agent_Failures(t *testing.T) {
 
 func TestManagementClient_Lab_Failures(t *testing.T) {
 	//Create a new api client
-	client, err := NewManagementClient(configManagementTest.BaseUrl)
+	client, err := NewManagementClient(configManagementTest.Http.BaseUrl)
 	if !assert.NoError(t, err, "error while creating a new api client") {
 		return
 	}
-	//Set configManagementTest.HttpAuthUsername and password
-	if configManagementTest.HttpAuthUsername != "" && configManagementTest.HttpAuthPassword != "" {
-		err = client.SetUsernameAndPassword(configManagementTest.HttpAuthUsername, configManagementTest.HttpAuthPassword)
+	//Set configManagementTest.Http.AuthUsername and password
+	if configManagementTest.Http.AuthUsername != "" && configManagementTest.Http.AuthPassword != "" {
+		err = client.SetUsernameAndPassword(configManagementTest.Http.AuthUsername, configManagementTest.Http.AuthPassword)
 		if !assert.NoError(t, err, "error while creating a new api client") {
 			return
 		}
@@ -736,13 +736,13 @@ func TestManagementClient_Lab_Failures(t *testing.T) {
 
 func TestManagementClient_Engine_Failures(t *testing.T) {
 	//Create a new api client
-	client, err := NewManagementClient(configManagementTest.BaseUrl)
+	client, err := NewManagementClient(configManagementTest.Http.BaseUrl)
 	if !assert.NoError(t, err, "error while creating a new api client") {
 		return
 	}
-	//Set configManagementTest.HttpAuthUsername and password
-	if configManagementTest.HttpAuthUsername != "" && configManagementTest.HttpAuthPassword != "" {
-		err = client.SetUsernameAndPassword(configManagementTest.HttpAuthUsername, configManagementTest.HttpAuthPassword)
+	//Set configManagementTest.Http.AuthUsername and password
+	if configManagementTest.Http.AuthUsername != "" && configManagementTest.Http.AuthPassword != "" {
+		err = client.SetUsernameAndPassword(configManagementTest.Http.AuthUsername, configManagementTest.Http.AuthPassword)
 		if !assert.NoError(t, err, "error while creating a new api client") {
 			return
 		}
@@ -947,13 +947,13 @@ func TestManagementClient_Engine_Failures(t *testing.T) {
 
 func TestManagementClient_User_Failures(t *testing.T) {
 	//Create a new api client
-	client, err := NewManagementClient(configManagementTest.BaseUrl)
+	client, err := NewManagementClient(configManagementTest.Http.BaseUrl)
 	if !assert.NoError(t, err, "error while creating a new api client") {
 		return
 	}
-	//Set configManagementTest.HttpAuthUsername and password
-	if configManagementTest.HttpAuthUsername != "" && configManagementTest.HttpAuthPassword != "" {
-		err = client.SetUsernameAndPassword(configManagementTest.HttpAuthUsername, configManagementTest.HttpAuthPassword)
+	//Set configManagementTest.Http.AuthUsername and password
+	if configManagementTest.Http.AuthUsername != "" && configManagementTest.Http.AuthPassword != "" {
+		err = client.SetUsernameAndPassword(configManagementTest.Http.AuthUsername, configManagementTest.Http.AuthPassword)
 		if !assert.NoError(t, err, "error while creating a new api client") {
 			return
 		}
@@ -1003,13 +1003,13 @@ func TestManagementClient_User_Failures(t *testing.T) {
 
 func TestManagementClient_Endpoint_Failures(t *testing.T) {
 	//Create a new api client
-	client, err := NewManagementClient(configManagementTest.BaseUrl)
+	client, err := NewManagementClient(configManagementTest.Http.BaseUrl)
 	if !assert.NoError(t, err, "error while creating a new api client") {
 		return
 	}
 	//Set username and password
-	if configManagementTest.HttpAuthUsername != "" && configManagementTest.HttpAuthPassword != "" {
-		err = client.SetUsernameAndPassword(configManagementTest.HttpAuthUsername, configManagementTest.HttpAuthPassword)
+	if configManagementTest.Http.AuthUsername != "" && configManagementTest.Http.AuthPassword != "" {
+		err = client.SetUsernameAndPassword(configManagementTest.Http.AuthUsername, configManagementTest.Http.AuthPassword)
 		if !assert.NoError(t, err, "error while creating a new api client") {
 			return
 		}

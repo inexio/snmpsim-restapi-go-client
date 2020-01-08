@@ -37,13 +37,13 @@ func TestMetricsClient_BuildUpSetupAndTestMetrics(t *testing.T) {
 	remoteRecordFilePath1 := agentDataDir1 + "/" + community + ".snmprec"
 
 	//Create a new api client
-	managementClient, err := NewManagementClient(configManagementTest.BaseUrl)
+	managementClient, err := NewManagementClient(configManagementTest.Http.BaseUrl)
 	if !assert.NoError(t, err, "error while creating a new api client") {
 		return
 	}
-	//Set configMetricsTest.HttpAuthUsername and password
-	if configManagementTest.HttpAuthUsername != "" && configManagementTest.HttpAuthPassword != "" {
-		err = managementClient.SetUsernameAndPassword(configManagementTest.HttpAuthUsername, configManagementTest.HttpAuthPassword)
+	//Set configMetricsTest.Http.AuthUsername and password
+	if configManagementTest.Http.AuthUsername != "" && configManagementTest.Http.AuthPassword != "" {
+		err = managementClient.SetUsernameAndPassword(configManagementTest.Http.AuthUsername, configManagementTest.Http.AuthPassword)
 		if !assert.NoError(t, err, "error while creating a new api client") {
 			return
 		}
@@ -245,13 +245,13 @@ func TestMetricsClient_BuildUpSetupAndTestMetrics(t *testing.T) {
 	//TODO test metric failures
 
 	//Create a new api client
-	metricsClient, err := NewMetricsClient(configMetricsTest.BaseUrl)
+	metricsClient, err := NewMetricsClient(configMetricsTest.Http.BaseUrl)
 	if !assert.NoError(t, err, "error while creating a new api client") {
 		return
 	}
-	//Set configMetricsTest.HttpAuthUsername and password
-	if configMetricsTest.HttpAuthUsername != "" && configMetricsTest.HttpAuthPassword != "" {
-		err = metricsClient.SetUsernameAndPassword(configMetricsTest.HttpAuthUsername, configMetricsTest.HttpAuthPassword)
+	//Set configMetricsTest.Http.AuthUsername and password
+	if configMetricsTest.Http.AuthUsername != "" && configMetricsTest.Http.AuthPassword != "" {
+		err = metricsClient.SetUsernameAndPassword(configMetricsTest.Http.AuthUsername, configMetricsTest.Http.AuthPassword)
 		if !assert.NoError(t, err, "error while creating a new api client") {
 			return
 		}
