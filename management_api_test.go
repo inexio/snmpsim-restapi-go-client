@@ -422,8 +422,8 @@ func TestManagementClient_UploadRecordFileString_DeleteRecordFile(t *testing.T) 
 	1.3.6.1.2.1.1.2.0|6|1.3.6.1.4.1.8072.3.2.10
 	1.3.6.1.2.1.1.3.0|67|123999999`
 
-	remotePathFile1 := "test-UploadRecordFileString_DeleteRecordFile/dir1/dir2/public.snmprec"
-	remotePathFile2 := "test-UploadRecordFileString_DeleteRecordFile/dir1/public.snmprec"
+	remotePathFile1 := configManagementTest.RootDataDir + "test-UploadRecordFileString_DeleteRecordFile/dir1/dir2/public.snmprec"
+	remotePathFile2 := configManagementTest.RootDataDir + "test-UploadRecordFileString_DeleteRecordFile/dir1/public.snmprec"
 
 	//Create a new api client
 	client, err := NewManagementClient(configManagementTest.Http.BaseUrl)
@@ -489,6 +489,294 @@ func TestManagementClient_UploadRecordFileString_DeleteRecordFile(t *testing.T) 
 			if err, ok := err.(HttpError); assert.True(t, ok, "error is not a http error", err.Error()) {
 				assert.True(t, err.StatusCode == 400, "error != 400")
 			}
+		}
+	*/
+}
+
+func TestManagementClient_Search(t *testing.T) {
+	//Create a new api client
+	client, err := NewManagementClient(configManagementTest.Http.BaseUrl)
+	if !assert.NoError(t, err, "error while creating a new api client") {
+		return
+	}
+	//Set configManagementTest.Http.AuthUsername and password
+	if configManagementTest.Http.AuthUsername != "" && configManagementTest.Http.AuthPassword != "" {
+		err = client.SetUsernameAndPassword(configManagementTest.Http.AuthUsername, configManagementTest.Http.AuthPassword)
+		if !assert.NoError(t, err, "error while creating a new api client") {
+			return
+		}
+	}
+
+	var m map[string]string
+
+	//LABS
+	labNameOn := "TestManagementClient_Search_power_on"
+	labNameOff := "TestManagementClient_Search_power_off"
+	labOn, err := createLabAndCheckForSuccess(t, client, labNameOn)
+	if err != nil {
+		return
+	}
+	defer func() {
+		_ = deleteLabAndCheckForSuccess(t, client, labOn)
+	}()
+	err = setLabPowerAndCheckForSuccess(t, client, labOn, true)
+	if err != nil {
+		return
+	}
+
+	labOff, err := createLabAndCheckForSuccess(t, client, labNameOff)
+	if err != nil {
+		return
+	}
+	defer func() {
+		_ = deleteLabAndCheckForSuccess(t, client, labOff)
+	}()
+
+	m = make(map[string]string)
+	m["name"] = labNameOn
+	m["power"] = "on"
+	labs, err := client.GetLabs(m)
+	if !assert.NoError(t, err, "error during SearchLabs") {
+		return
+	}
+	if assert.True(t, len(labs) == 1, "there was more than one lab found in search request") {
+		assert.True(t, labs[0].Id == labOn.Id, "the wrong lab was found in search request")
+	}
+
+	m = make(map[string]string)
+	m["name"] = labNameOff
+	labs, err = client.GetLabs(m)
+	if !assert.NoError(t, err, "error during SearchLabs") {
+		return
+	}
+	if assert.True(t, len(labs) == 1, "there was more than one lab found in search request") {
+		assert.True(t, labs[0].Id == labOff.Id, "the wrong lab was found in search request")
+	}
+
+	//this should return no result
+	m = make(map[string]string)
+	m["name"] = "TestManagementClient_Search_power_off"
+	m["power"] = "on"
+	labs, err = client.GetLabs(m)
+	if !assert.NoError(t, err, "error during SearchLabs") {
+		return
+	}
+	assert.True(t, len(labs) == 0, "one lab was found in search request, but it was supposed to find 0")
+
+	//AGENTS
+	agentName1 := "TestManagementClient_Search_1"
+	agentName2 := "TestManagementClient_Search_2"
+	agent1, err := createAgentAndCheckForSuccess(t, client, agentName1, agentName1)
+	if err != nil {
+		return
+	}
+	defer func() {
+		_ = deleteAgentAndCheckForSuccess(t, client, agent1)
+	}()
+	agent2, err := createAgentAndCheckForSuccess(t, client, agentName2, agentName2)
+	if err != nil {
+		return
+	}
+	defer func() {
+		_ = deleteAgentAndCheckForSuccess(t, client, agent2)
+	}()
+
+	m = make(map[string]string)
+	m["name"] = agentName1
+	m["data_dir"] = agent1.DataDir //this var must be used for the search request, because the returned data_dir is always an absolute path, but the data dir we define is relative
+	agents, err := client.GetAgents(m)
+
+	if !assert.NoError(t, err, "error during SearchAgents") {
+		return
+	}
+	if assert.True(t, len(agents) == 1, "there was more than one agent found in search request") {
+		assert.True(t, agents[0].Id == agent1.Id, "the wrong lab was found in search request")
+	}
+
+	m = make(map[string]string)
+	m["name"] = agentName2
+	agents, err = client.GetAgents(m)
+	if !assert.NoError(t, err, "error during SearchAgents") {
+		return
+	}
+	if assert.True(t, len(agents) == 1, "there was more than one agent found in search request") {
+		assert.True(t, agents[0].Id == agent2.Id, "the wrong lab was found in search request")
+	}
+
+	m = make(map[string]string)
+	m["name"] = agentName1
+	m["data_dir"] = agent2.DataDir
+	agents, err = client.GetAgents(m)
+	if !assert.NoError(t, err, "error during SearchAgents") {
+		return
+	}
+	assert.True(t, len(agents) == 0, "one agent was found in search request, but it was supposed to find 0")
+
+	//ENGINES
+	engineName1 := "TestManagementClient_Search_1"
+	engineId1 := "010203040507080C"
+	engineName2 := "TestManagementClient_Search_2"
+	engineId2 := "010203040507080D"
+	engine1, err := createEngineAndCheckForSuccess(t, client, engineName1, engineId1)
+	if err != nil {
+		return
+	}
+	defer func() {
+		_ = deleteEngineAndCheckForSuccess(t, client, engine1)
+	}()
+	engine2, err := createEngineAndCheckForSuccess(t, client, engineName2, engineId2)
+	if err != nil {
+		return
+	}
+	defer func() {
+		_ = deleteEngineAndCheckForSuccess(t, client, engine2)
+	}()
+
+	m = make(map[string]string)
+	m["name"] = engineName1
+	m["engine_id"] = engineId1
+	engines, err := client.GetEngines(m)
+
+	if !assert.NoError(t, err, "error during SearchEngines") {
+		return
+	}
+	if assert.True(t, len(engines) == 1, "there was more than one engine found in search request") {
+		assert.True(t, engines[0].Id == engine1.Id, "the wrong lab was found in search request")
+	}
+
+	m = make(map[string]string)
+	m["name"] = engineName2
+	engines, err = client.GetEngines(m)
+	if !assert.NoError(t, err, "error during SearchEngines") {
+		return
+	}
+	if assert.True(t, len(engines) == 1, "there was more than one engine found in search request") {
+		assert.True(t, engines[0].Id == engine2.Id, "the wrong lab was found in search request")
+	}
+
+	m = make(map[string]string)
+	m["name"] = engineName1
+	m["engine_id"] = engineId2
+	engines, err = client.GetEngines(m)
+	if !assert.NoError(t, err, "error during SearchEngines") {
+		return
+	}
+	assert.True(t, len(engines) == 0, "one engine was found in search request, but it was supposed to find 0")
+
+	//ENDPOINTS
+	endpointName1 := "TestManagementClient_Search_1"
+	endpointAddress1 := configManagementTest.Agent1.EndpointAddress + ":" + strconv.Itoa(configManagementTest.Agent1.EndpointPort[0])
+	endpointName2 := "TestManagementClient_Search_2"
+	endpointAddress2 := configManagementTest.Agent2.EndpointAddress + ":" + strconv.Itoa(configManagementTest.Agent2.EndpointPort[0])
+
+	endpoint1, err := createEndpointAndCheckForSuccess(t, client, endpointName1, endpointAddress1, configManagementTest.Protocol)
+	if err != nil {
+		return
+	}
+	defer func() {
+		_ = deleteEndpointAndCheckForSuccess(t, client, endpoint1)
+	}()
+	endpoint2, err := createEndpointAndCheckForSuccess(t, client, endpointName2, endpointAddress2, configManagementTest.Protocol)
+	if err != nil {
+		return
+	}
+	defer func() {
+		_ = deleteEndpointAndCheckForSuccess(t, client, endpoint2)
+	}()
+
+	m = make(map[string]string)
+	m["name"] = endpointName1
+	m["address"] = endpointAddress1
+	endpoints, err := client.GetEndpoints(m)
+
+	if !assert.NoError(t, err, "error during SearchEndpoints") {
+		return
+	}
+	if assert.True(t, len(endpoints) == 1, "there was more than one endpoint found in search request") {
+		assert.True(t, endpoints[0].Id == endpoint1.Id, "the wrong lab was found in search request")
+	}
+
+	m = make(map[string]string)
+	m["name"] = endpointName2
+	endpoints, err = client.GetEndpoints(m)
+	if !assert.NoError(t, err, "error during SearchEndpoints") {
+		return
+	}
+	if assert.True(t, len(endpoints) == 1, "there was more than one endpoint found in search request") {
+		assert.True(t, endpoints[0].Id == endpoint2.Id, "the wrong lab was found in search request")
+	}
+
+	m = make(map[string]string)
+	m["name"] = endpointName1
+	m["address"] = endpointAddress2
+	endpoints, err = client.GetEndpoints(m)
+	if !assert.NoError(t, err, "error during SearchEndpoints") {
+		return
+	}
+	assert.True(t, len(endpoints) == 0, "one endpoint was found in search request, but it was supposed to find 0")
+
+	//Users
+	userName1 := "TestManagementClient_Search_1"
+	userAuthKey1 := "0x50dd4d3ec79a1cf4dfa5fee9f76b0847647fcf74"
+	userAuthProto1 := "sha"
+
+	userName2 := "TestManagementClient_Search_2"
+
+	user1, err := createUserAndCheckForSuccess(t, client, userName1, userName1, userAuthKey1, userAuthProto1, "", "")
+	if err != nil {
+		return
+	}
+	defer func() {
+		_ = deleteUserAndCheckForSuccess(t, client, user1)
+	}()
+	user2, err := createUserAndCheckForSuccess(t, client, userName2, userName2, "", "", "", "")
+	if err != nil {
+		return
+	}
+	defer func() {
+		_ = deleteUserAndCheckForSuccess(t, client, user2)
+	}()
+
+	m = make(map[string]string)
+	m["name"] = userName1
+	m["auth_key"] = userAuthKey1
+	m["auth_proto"] = userAuthProto1
+	users, err := client.GetUsers(m)
+
+	if !assert.NoError(t, err, "error during SearchUsers") {
+		return
+	}
+
+	if assert.True(t, len(users) == 1, "there was more than one user found in search request") {
+		assert.True(t, users[0].Id == user1.Id, "the wrong lab was found in search request")
+	}
+
+	m = make(map[string]string)
+	m["name"] = userName2
+	users, err = client.GetUsers(m)
+	if !assert.NoError(t, err, "error during SearchUsers") {
+		return
+	}
+	if assert.True(t, len(users) == 1, "there was more than one user found in search request") {
+		assert.True(t, users[0].Id == user2.Id, "the wrong lab was found in search request")
+	}
+
+	m = make(map[string]string)
+	m["name"] = userName2
+	m["auth_key"] = userAuthKey1
+	users, err = client.GetUsers(m)
+	if !assert.NoError(t, err, "error during SearchUsers") {
+		return
+	}
+	assert.True(t, len(users) == 0, "one user was found in search request, but it was supposed to find 0")
+
+	//TODO: this should cause an api error but does not
+	/*
+		//Check non existent filters
+		m = make(map[string]string)
+		m["dsdsdar4"] = "test"
+		users, err = client.GetUsers(m)
+		if assert.Error(t, err, "there was no error returned when tried to filter on a non existing filter") {
 		}
 	*/
 }
@@ -631,8 +919,6 @@ func TestManagementClient_Lab_Failures(t *testing.T) {
 			return
 		}
 	}
-
-	//TODO: this should cause an api error but does not
 
 	//Get Invalid Lab
 	_, err = client.GetLab(-1)
@@ -870,7 +1156,7 @@ func TestManagementClient_Engine_Failures(t *testing.T) {
 
 	//TODO: this should cause an api error but does not
 	/*
-		//add invalid endpoint to engine
+		//add invalid user to engine
 		err = client.AddEndpointToEngine(engine.Id, -1)
 		if assert.Error(t, err, "no error when an invalid endpoint id was added to an engine") {
 			if err, ok := err.(HttpError); assert.True(t, ok, "error is not a http error", err.Error()) {

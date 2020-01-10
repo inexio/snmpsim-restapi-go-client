@@ -38,16 +38,16 @@ LABS
 */
 
 /*
-GetLabs returns a list of all labs.
+GetLabs returns a list of labs, optionally filtered.
 */
-func (c *ManagementClient) GetLabs() (Labs, error) {
+func (c *ManagementClient) GetLabs(filter map[string]string) (Labs, error) {
 	if !c.isValid() {
 		return nil, &NotValidError{}
 	}
 
-	response, err := c.request("GET", mgmtEndpointPath+"labs", "", nil, nil)
+	response, err := c.request("GET", mgmtEndpointPath+"labs", "", nil, filter)
 	if err != nil {
-		return nil, errors.Wrap(err, "error during get labs request")
+		return nil, errors.Wrap(err, "error during search labs request")
 	}
 	if response.StatusCode() != 200 {
 		return nil, getHttpError(response)
@@ -205,14 +205,14 @@ ENGINES
 /*
 GetEngines returns a list of all engines.
 */
-func (c *ManagementClient) GetEngines() (Engines, error) {
+func (c *ManagementClient) GetEngines(filter map[string]string) (Engines, error) {
 	if !c.isValid() {
 		return nil, &NotValidError{}
 	}
 
-	response, err := c.request("GET", mgmtEndpointPath+"engines", "", nil, nil)
+	response, err := c.request("GET", mgmtEndpointPath+"engines", "", nil, filter)
 	if err != nil {
-		return nil, errors.Wrap(err, "error during get labs request")
+		return nil, errors.Wrap(err, "error during search engines request")
 	}
 	if response.StatusCode() != 200 {
 		return nil, getHttpError(response)
@@ -394,16 +394,16 @@ AGENTS
 */
 
 /*
-GetAgents returns a list of all agents.
+GetAgents returns a list of agents, optionally filtered.
 */
-func (c *ManagementClient) GetAgents() (Agents, error) {
+func (c *ManagementClient) GetAgents(filters map[string]string) (Agents, error) {
 	if !c.isValid() {
 		return nil, &NotValidError{}
 	}
 
-	response, err := c.request("GET", mgmtEndpointPath+"agents", "", nil, nil)
+	response, err := c.request("GET", mgmtEndpointPath+"agents", "", nil, filters)
 	if err != nil {
-		return nil, errors.Wrap(err, "error during get labs request")
+		return nil, errors.Wrap(err, "error during search agents request")
 	}
 	if response.StatusCode() != 200 {
 		return nil, getHttpError(response)
@@ -563,16 +563,16 @@ ENDPOINTS
 */
 
 /*
-GetEndpoints returns a list of all endpoints.
+GetEndpoints returns a list of endpoints, optionally filtered.
 */
-func (c *ManagementClient) GetEndpoints() (Endpoints, error) {
+func (c *ManagementClient) GetEndpoints(filters map[string]string) (Endpoints, error) {
 	if !c.isValid() {
 		return nil, &NotValidError{}
 	}
 
-	response, err := c.request("GET", mgmtEndpointPath+"endpoints", "", nil, nil)
+	response, err := c.request("GET", mgmtEndpointPath+"endpoints", "", nil, filters)
 	if err != nil {
-		return nil, errors.Wrap(err, "error during get labs request")
+		return nil, errors.Wrap(err, "error during search endpoints request")
 	}
 	if response.StatusCode() != 200 {
 		return nil, getHttpError(response)
@@ -854,16 +854,16 @@ func (c *ManagementClient) CreateUser(user, name, authKey, authProto, privKey, p
 }
 
 /*
-GetUsers returns a list of all users.
+GetUsers returns a list of users, optionally fitlered.
 */
-func (c *ManagementClient) GetUsers() (Users, error) {
+func (c *ManagementClient) GetUsers(filters map[string]string) (Users, error) {
 	if !c.isValid() {
 		return nil, &NotValidError{}
 	}
 
-	response, err := c.request("GET", mgmtEndpointPath+"users", "", nil, nil)
+	response, err := c.request("GET", mgmtEndpointPath+"users", "", nil, filters)
 	if err != nil {
-		return nil, errors.Wrap(err, "error during get labs request")
+		return nil, errors.Wrap(err, "error during search users request")
 	}
 	if response.StatusCode() != 200 {
 		return nil, getHttpError(response)

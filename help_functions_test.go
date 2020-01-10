@@ -5,10 +5,10 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
-	"strings"
 	"os"
 	"path"
 	"runtime"
+	"strings"
 	"testing"
 )
 
@@ -18,28 +18,28 @@ type agentData struct {
 }
 
 type httpConfig struct {
-	BaseUrl         string    `mapstructure:"baseUrl"`
-	AuthUsername 	string    `mapstructure:"authUsername"`
-	AuthPassword 	string    `mapstructure:"authPassword"`
+	BaseUrl      string `mapstructure:"baseUrl"`
+	AuthUsername string `mapstructure:"authUsername"`
+	AuthPassword string `mapstructure:"authPassword"`
 }
 
 type configMetricsApiTest struct {
-	Http            httpConfig	`mapstructure:"http"`
-	Protocol        string    	`mapstructure:"protocol"`
-	Agent1          agentData 	`mapstructure:"agent1"`
-	RootDataDir     string    	`mapstructure:"rootDataDir"`
-	TestDataDir     string
+	Http        httpConfig `mapstructure:"http"`
+	Protocol    string     `mapstructure:"protocol"`
+	Agent1      agentData  `mapstructure:"agent1"`
+	RootDataDir string     `mapstructure:"rootDataDir"`
+	TestDataDir string
 }
 
 var configMetricsTest configMetricsApiTest
 
 type configManagementApiTest struct {
-	Http            httpConfig	`mapstructure:"http"`
-	Protocol        string    	`mapstructure:"protocol"`
-	Agent1          agentData 	`mapstructure:"agent1"`
-	Agent2          agentData 	`mapstructure:"agent2"`
-	RootDataDir     string    	`mapstructure:"rootDataDir"`
-	TestDataDir     string
+	Http        httpConfig `mapstructure:"http"`
+	Protocol    string     `mapstructure:"protocol"`
+	Agent1      agentData  `mapstructure:"agent1"`
+	Agent2      agentData  `mapstructure:"agent2"`
+	RootDataDir string     `mapstructure:"rootDataDir"`
+	TestDataDir string
 }
 
 var configManagementTest configManagementApiTest
@@ -106,7 +106,7 @@ func createAgentAndCheckForSuccess(t *testing.T, client *ManagementClient, name,
 	}
 
 	//Test if lab was created
-	agents, err := client.GetAgents()
+	agents, err := client.GetAgents(nil)
 	if !assert.NoError(t, err, "error during GetAgents()") {
 		return Agent{}, err
 	}
@@ -121,7 +121,7 @@ func deleteAgentAndCheckForSuccess(t *testing.T, client *ManagementClient, agent
 	err := client.DeleteAgent(agent.Id)
 	assert.NoError(t, err, "error while deleting lab")
 
-	agents, err := client.GetAgents()
+	agents, err := client.GetAgents(nil)
 	if !assert.NoError(t, err, "error during GetAgents()") {
 		return err
 	}
@@ -175,7 +175,7 @@ func createLabAndCheckForSuccess(t *testing.T, client *ManagementClient, name st
 	}
 
 	//Test if lab was created
-	labs, err := client.GetLabs()
+	labs, err := client.GetLabs(nil)
 	if !assert.NoError(t, err, "error during GetLabs()") {
 		return Lab{}, err
 	}
@@ -190,7 +190,7 @@ func deleteLabAndCheckForSuccess(t *testing.T, client *ManagementClient, lab Lab
 	assert.NoError(t, err, "error while deleting lab")
 
 	//Test if lab was deleted
-	labs, err := client.GetLabs()
+	labs, err := client.GetLabs(nil)
 	if !assert.NoError(t, err, "error during GetLabs()") {
 		return err
 	}
@@ -264,7 +264,7 @@ func createEngineAndCheckForSuccess(t *testing.T, client *ManagementClient, name
 	}
 
 	//Test if engine was created
-	engines, err := client.GetEngines()
+	engines, err := client.GetEngines(nil)
 	if !assert.NoError(t, err, "error during GetEngines()") {
 		return Engine{}, err
 	}
@@ -279,7 +279,7 @@ func deleteEngineAndCheckForSuccess(t *testing.T, client *ManagementClient, engi
 	assert.NoError(t, err, "error while deleting engine")
 
 	//Test if engine was deleted
-	engines, err := client.GetEngines()
+	engines, err := client.GetEngines(nil)
 	if !assert.NoError(t, err, "error during GetEngines()") {
 		return err
 	}
@@ -366,7 +366,7 @@ func createEndpointAndCheckForSuccess(t *testing.T, client *ManagementClient, na
 	}
 
 	//Test if endpoint was created
-	endpoints, err := client.GetEndpoints()
+	endpoints, err := client.GetEndpoints(nil)
 	if !assert.NoError(t, err, "error during GetEndpoints()") {
 		return Endpoint{}, err
 	}
@@ -382,7 +382,7 @@ func deleteEndpointAndCheckForSuccess(t *testing.T, client *ManagementClient, en
 	assert.NoError(t, err, "error while deleting endpoint")
 
 	//Test if endpoint was deleted
-	endpoints, err := client.GetEndpoints()
+	endpoints, err := client.GetEndpoints(nil)
 	if !assert.NoError(t, err, "error during GetEndpoints()") {
 		return err
 	}
@@ -403,7 +403,7 @@ func createUserAndCheckForSuccess(t *testing.T, client *ManagementClient, userId
 	}
 
 	//Test if user was created
-	users, err := client.GetUsers()
+	users, err := client.GetUsers(nil)
 	if !assert.NoError(t, err, "error during GetUsers()") {
 		return User{}, err
 	}
@@ -419,7 +419,7 @@ func deleteUserAndCheckForSuccess(t *testing.T, client *ManagementClient, user U
 	assert.NoError(t, err, "error while deleting user")
 
 	//Test if user was deleted
-	users, err := client.GetUsers()
+	users, err := client.GetUsers(nil)
 	if !assert.NoError(t, err, "error during GetUsers()") {
 		return err
 	}
