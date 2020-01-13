@@ -40,6 +40,8 @@ type configManagementApiTest struct {
 	Agent2      agentData  `mapstructure:"agent2"`
 	RootDataDir string     `mapstructure:"rootDataDir"`
 	TestDataDir string
+	TestTagId   int
+	TestTagName string `mapstructure:"testTag"`
 }
 
 var configManagementTest configManagementApiTest
@@ -61,7 +63,6 @@ func init() {
 		fmt.Println("Failed to read management config file!", err)
 		os.Exit(2)
 	}
-
 	err = viperManagement.Unmarshal(&configManagementTest)
 	if err != nil {
 		fmt.Println("Failed to unmarshal config file!")
@@ -89,6 +90,53 @@ func init() {
 	}
 
 	configMetricsTest.TestDataDir = testDataDir
+
+	//tags
+	//Create a new api client
+	client, err := NewManagementClient(configManagementTest.Http.BaseUrl)
+	if err != nil {
+		fmt.Println("Failed to create a new Management Client during init()!", err)
+		os.Exit(2)
+	}
+	//Set configManagementTest.Http.AuthUsername and password
+	if configManagementTest.Http.AuthUsername != "" && configManagementTest.Http.AuthPassword != "" {
+		err = client.SetUsernameAndPassword(configManagementTest.Http.AuthUsername, configManagementTest.Http.AuthPassword)
+		if err != nil {
+			fmt.Println("Failed to set http auth username and password during init()!", err)
+			os.Exit(2)
+		}
+	}
+
+	tagFilter := make(map[string]string)
+	tagFilter["name"] = configManagementTest.TestTagName
+	tags, err := client.GetTags(tagFilter)
+	if err != nil {
+		fmt.Println("Error while trying to get the object tag for the test!", err)
+		os.Exit(2)
+	}
+
+	switch tagsCount := len(tags); tagsCount {
+	case 1:
+		//this is the usual case
+		configManagementTest.TestTagId = tags[0].Id
+
+		//delete objects with this text
+		err = client.DeleteAllObjectsWithTag(configManagementTest.TestTagId)
+	case 0:
+		//tag not found, this might be legit when the test runs for the first time or the snmpsim db was recreated
+		fmt.Println("No tag for management api test found -> creating a new tag!")
+		tag, err := client.CreateTag(tagFilter["name"], "tag for tagging objects used in test cases in the management api test")
+		if err != nil {
+			fmt.Println("Failed to create a new tag for management api test!")
+			os.Exit(2)
+		}
+		fmt.Println("Successfully created new tag for management api test!")
+		configManagementTest.TestTagId = tag.Id
+	default:
+		//more than one tag found, something is wrong
+		fmt.Println("There was more than one tag found for the management api test!")
+		os.Exit(2)
+	}
 }
 
 /*
@@ -100,7 +148,7 @@ AGENTS
 */
 
 func createAgentAndCheckForSuccess(t *testing.T, client *ManagementClient, name, dataDir string) (Agent, error) {
-	agent, err := client.CreateAgent(name, dataDir)
+	agent, err := client.CreateAgentWithTag(name, dataDir, configManagementTest.TestTagId)
 	if !assert.NoError(t, err, "error while creating a new agent") {
 		return Agent{}, err
 	}
@@ -125,7 +173,7 @@ func deleteAgentAndCheckForSuccess(t *testing.T, client *ManagementClient, agent
 	if !assert.NoError(t, err, "error during GetAgents()") {
 		return err
 	}
-	if !assert.False(t, agentExists(agent, agents), "created agent was found in list of agents") {
+	if !assert.False(t, agentExists(agent, agents), "deleted agent was found in list of agents") {
 		return errors.New("assertion failed")
 	}
 	return nil
@@ -164,12 +212,44 @@ func removeEngineFromAgentAndCheckForSuccess(t *testing.T, client *ManagementCli
 	return nil
 }
 
+func addTagToAgentAndCheckForSuccess(t *testing.T, client *ManagementClient, agent Agent, tag Tag) error {
+	err := client.AddTagToAgent(agent.Id, tag.Id)
+	if !assert.NoError(t, err, "error while adding tag to agent") {
+		return err
+	}
+
+	//Test if tag was added to the agent
+	agent, err = client.GetAgent(agent.Id)
+	if !assert.NoError(t, err, "error while get agent") {
+		return err
+	}
+	if !assert.True(t, tagExists(tag, agent.Tags), "tag was successfully added to an agent, but cannot be found in the agents tag list") {
+		return errors.New("assertion failed")
+	}
+	return nil
+}
+
+func removeTagFromAgentAndCheckForSuccess(t *testing.T, client *ManagementClient, agent Agent, tag Tag) error {
+	err := client.RemoveTagFromAgent(agent.Id, tag.Id)
+	if !assert.NoError(t, err, "error while removing tag from agent") {
+		return err
+	}
+	agent, err = client.GetAgent(agent.Id)
+	if !assert.NoError(t, err, "error while get agent") {
+		return err
+	}
+	if !assert.False(t, tagExists(tag, agent.Tags), "agent is still tagged after successfully removing tag") {
+		return errors.New("assertion failed")
+	}
+	return nil
+}
+
 /*
 LABS
 */
 
 func createLabAndCheckForSuccess(t *testing.T, client *ManagementClient, name string) (Lab, error) {
-	lab, err := client.CreateLab(name)
+	lab, err := client.CreateLabWithTag(name, configManagementTest.TestTagId)
 	if !assert.NoError(t, err, "error while creating a new lab") {
 		return Lab{}, err
 	}
@@ -179,7 +259,7 @@ func createLabAndCheckForSuccess(t *testing.T, client *ManagementClient, name st
 	if !assert.NoError(t, err, "error during GetLabs()") {
 		return Lab{}, err
 	}
-	if !assert.True(t, labsExists(lab, labs), "created lab was not found in list of labs") {
+	if !assert.True(t, labExists(lab, labs), "created lab was not found in list of labs") {
 		return Lab{}, errors.New("assertion failed")
 	}
 	return lab, nil
@@ -194,7 +274,7 @@ func deleteLabAndCheckForSuccess(t *testing.T, client *ManagementClient, lab Lab
 	if !assert.NoError(t, err, "error during GetLabs()") {
 		return err
 	}
-	if !assert.False(t, labsExists(lab, labs), "created lab was not found in list of labs") {
+	if !assert.False(t, labExists(lab, labs), "deleted lab was found in list of labs") {
 		return err
 	}
 	return nil
@@ -252,13 +332,44 @@ func setLabPowerAndCheckForSuccess(t *testing.T, client *ManagementClient, lab L
 	return nil
 }
 
+func addTagToLabAndCheckForSuccess(t *testing.T, client *ManagementClient, lab Lab, tag Tag) error {
+	err := client.AddTagToLab(lab.Id, tag.Id)
+	if !assert.NoError(t, err, "error while adding tag to lab") {
+		return err
+	}
+
+	//Test if tag was added to the lab
+	lab, err = client.GetLab(lab.Id)
+	if !assert.NoError(t, err, "error while get lab") {
+		return err
+	}
+	if !assert.True(t, tagExists(tag, lab.Tags), "tag was successfully added to an lab, but cannot be found in the labs tag list") {
+		return errors.New("assertion failed")
+	}
+	return nil
+}
+
+func removeTagFromLabAndCheckForSuccess(t *testing.T, client *ManagementClient, lab Lab, tag Tag) error {
+	err := client.RemoveTagFromLab(lab.Id, tag.Id)
+	if !assert.NoError(t, err, "error while removing tag from lab") {
+		return err
+	}
+	lab, err = client.GetLab(lab.Id)
+	if !assert.NoError(t, err, "error while get lab") {
+		return err
+	}
+	if !assert.False(t, tagExists(tag, lab.Tags), "lab is still tagged after successfully removing tag") {
+		return errors.New("assertion failed")
+	}
+	return nil
+}
+
 /*
 ENGINES
 */
-
 func createEngineAndCheckForSuccess(t *testing.T, client *ManagementClient, name, engineId string) (Engine, error) {
 	//Create an engine
-	engine, err := client.CreateEngine(name, engineId)
+	engine, err := client.CreateEngineWithTag(name, engineId, configManagementTest.TestTagId)
 	if !assert.NoError(t, err, "error while creating a new api engine") {
 		return Engine{}, err
 	}
@@ -268,7 +379,7 @@ func createEngineAndCheckForSuccess(t *testing.T, client *ManagementClient, name
 	if !assert.NoError(t, err, "error during GetEngines()") {
 		return Engine{}, err
 	}
-	if !assert.True(t, engineExist(engine, engines), "created engine was not found in list of engines") {
+	if !assert.True(t, engineExists(engine, engines), "created engine was not found in list of engines") {
 		return Engine{}, errors.New("assertion failed")
 	}
 	return engine, nil
@@ -283,7 +394,7 @@ func deleteEngineAndCheckForSuccess(t *testing.T, client *ManagementClient, engi
 	if !assert.NoError(t, err, "error during GetEngines()") {
 		return err
 	}
-	if !assert.False(t, engineExist(engine, engines), "created engine was not found in list of engines") {
+	if !assert.False(t, engineExists(engine, engines), "created engine was not found in list of engines") {
 		return err
 	}
 	return nil
@@ -355,12 +466,44 @@ func removeEndpointFromEngineAndCheckForSuccess(t *testing.T, client *Management
 	return nil
 }
 
+func addTagToEngineAndCheckForSuccess(t *testing.T, client *ManagementClient, engine Engine, tag Tag) error {
+	err := client.AddTagToEngine(engine.Id, tag.Id)
+	if !assert.NoError(t, err, "error while adding tag to engine") {
+		return err
+	}
+
+	//Test if tag was added to the engine
+	engine, err = client.GetEngine(engine.Id)
+	if !assert.NoError(t, err, "error while get engine") {
+		return err
+	}
+	if !assert.True(t, tagExists(tag, engine.Tags), "tag was successfully added to an engine, but cannot be found in the engines tag list") {
+		return errors.New("assertion failed")
+	}
+	return nil
+}
+
+func removeTagFromEngineAndCheckForSuccess(t *testing.T, client *ManagementClient, engine Engine, tag Tag) error {
+	err := client.RemoveTagFromEngine(engine.Id, tag.Id)
+	if !assert.NoError(t, err, "error while removing tag from engine") {
+		return err
+	}
+	engine, err = client.GetEngine(engine.Id)
+	if !assert.NoError(t, err, "error while get engine") {
+		return err
+	}
+	if !assert.False(t, tagExists(tag, engine.Tags), "engine is still tagged after successfully removing tag") {
+		return errors.New("assertion failed")
+	}
+	return nil
+}
+
 /*
 ENDPOINTS
 */
 
 func createEndpointAndCheckForSuccess(t *testing.T, client *ManagementClient, name, address, domain string) (Endpoint, error) {
-	endpoint, err := client.CreateEndpoint(name, address, domain)
+	endpoint, err := client.CreateEndpointWithTag(name, address, domain, configManagementTest.TestTagId)
 	if !assert.NoError(t, err, "error while creating a new endpoint") {
 		return Endpoint{}, err
 	}
@@ -371,7 +514,7 @@ func createEndpointAndCheckForSuccess(t *testing.T, client *ManagementClient, na
 		return Endpoint{}, err
 	}
 
-	if !assert.True(t, endpointExist(endpoint, endpoints), "created endpoint was not found in list of endpoints") {
+	if !assert.True(t, endpointExists(endpoint, endpoints), "created endpoint was not found in list of endpoints") {
 		return Endpoint{}, errors.New("assertion failed")
 	}
 	return endpoint, nil
@@ -386,8 +529,39 @@ func deleteEndpointAndCheckForSuccess(t *testing.T, client *ManagementClient, en
 	if !assert.NoError(t, err, "error during GetEndpoints()") {
 		return err
 	}
-	if !assert.False(t, endpointExist(endpoint, endpoints), "created endpoint was not found in list of endpoints") {
+	if !assert.False(t, endpointExists(endpoint, endpoints), "deleted endpoint was found in list of endpoints") {
 		return err
+	}
+	return nil
+}
+
+func addTagToEndpointAndCheckForSuccess(t *testing.T, client *ManagementClient, endpoint Endpoint, tag Tag) error {
+	err := client.AddTagToEndpoint(endpoint.Id, tag.Id)
+	if !assert.NoError(t, err, "error while adding tag to endpoint") {
+		return err
+	}
+	//Test if tag was added to the endpoint
+	endpoint, err = client.GetEndpoint(endpoint.Id)
+	if !assert.NoError(t, err, "error while get endpoint") {
+		return err
+	}
+	if !assert.True(t, tagExists(tag, endpoint.Tags), "tag was successfully added to an endpoint, but cannot be found in the endpoints tag list") {
+		return errors.New("assertion failed")
+	}
+	return nil
+}
+
+func removeTagFromEndpointAndCheckForSuccess(t *testing.T, client *ManagementClient, endpoint Endpoint, tag Tag) error {
+	err := client.RemoveTagFromEndpoint(endpoint.Id, tag.Id)
+	if !assert.NoError(t, err, "error while removing tag from endpoint") {
+		return err
+	}
+	endpoint, err = client.GetEndpoint(endpoint.Id)
+	if !assert.NoError(t, err, "error while get endpoint") {
+		return err
+	}
+	if !assert.False(t, tagExists(tag, endpoint.Tags), "endpoint is still tagged after successfully removing tag") {
+		return errors.New("assertion failed")
 	}
 	return nil
 }
@@ -397,7 +571,7 @@ USERS
 */
 
 func createUserAndCheckForSuccess(t *testing.T, client *ManagementClient, userIdentifier, name, authKey, authProto, privKey, privProto string) (User, error) {
-	user, err := client.CreateUser(userIdentifier, name, authKey, authProto, privKey, privProto)
+	user, err := client.CreateUserWithTag(userIdentifier, name, authKey, authProto, privKey, privProto, configManagementTest.TestTagId)
 	if !assert.NoError(t, err, "error while creating a new user") {
 		return User{}, err
 	}
@@ -408,7 +582,7 @@ func createUserAndCheckForSuccess(t *testing.T, client *ManagementClient, userId
 		return User{}, err
 	}
 
-	if !assert.True(t, userExist(user, users), "created user was not found in list of users") {
+	if !assert.True(t, userExists(user, users), "created user was not found in list of users") {
 		return User{}, errors.New("assertion failed")
 	}
 	return user, nil
@@ -423,8 +597,40 @@ func deleteUserAndCheckForSuccess(t *testing.T, client *ManagementClient, user U
 	if !assert.NoError(t, err, "error during GetUsers()") {
 		return err
 	}
-	if !assert.False(t, userExist(user, users), "deleted user was not found in list of users") {
+	if !assert.False(t, userExists(user, users), "deleted user was not found in list of users") {
 		return err
+	}
+	return nil
+}
+
+func addTagToUserAndCheckForSuccess(t *testing.T, client *ManagementClient, user User, tag Tag) error {
+	err := client.AddTagToUser(user.Id, tag.Id)
+	if !assert.NoError(t, err, "error while adding tag to user") {
+		return err
+	}
+
+	//Test if tag was added to the user
+	user, err = client.GetUser(user.Id)
+	if !assert.NoError(t, err, "error while get user") {
+		return err
+	}
+	if !assert.True(t, tagExists(tag, user.Tags), "tag was successfully added to an user, but cannot be found in the users tag list") {
+		return errors.New("assertion failed")
+	}
+	return nil
+}
+
+func removeTagFromUserAndCheckForSuccess(t *testing.T, client *ManagementClient, user User, tag Tag) error {
+	err := client.RemoveTagFromUser(user.Id, tag.Id)
+	if !assert.NoError(t, err, "error while removing tag from user") {
+		return err
+	}
+	user, err = client.GetUser(user.Id)
+	if !assert.NoError(t, err, "error while get user") {
+		return err
+	}
+	if !assert.False(t, tagExists(tag, user.Tags), "user is still tagged after successfully removing tag") {
+		return errors.New("assertion failed")
 	}
 	return nil
 }
@@ -461,6 +667,41 @@ func deleteRecordFileAndCheckForSuccess(t *testing.T, client *ManagementClient, 
 	}
 	_, err = client.GetRecordFile(remotePath)
 	if !assert.Error(t, err, "error during GetRecordFile()") {
+		return err
+	}
+	return nil
+}
+
+/*
+ TAGS
+*/
+func createTagAndCheckForSuccess(t *testing.T, client *ManagementClient, name, description string) (Tag, error) {
+	tag, err := client.CreateTag(name, description)
+	if !assert.NoError(t, err, "error while creating a new tag") {
+		return Tag{}, err
+	}
+
+	//Test if tag was created
+	tags, err := client.GetTags(nil)
+	if !assert.NoError(t, err, "error during GetTags()") {
+		return Tag{}, err
+	}
+	if !assert.True(t, tagExists(tag, tags), "created tag was not found in list of tags") {
+		return Tag{}, errors.New("assertion failed")
+	}
+	return tag, nil
+}
+
+func deleteTagAndCheckForSuccess(t *testing.T, client *ManagementClient, tag Tag) error {
+	err := client.DeleteTag(tag.Id)
+	assert.NoError(t, err, "error while deleting tag")
+
+	//Test if tag was deleted
+	tags, err := client.GetTags(nil)
+	if !assert.NoError(t, err, "error during GetTags()") {
+		return err
+	}
+	if !assert.False(t, tagExists(tag, tags), "created tag was not found in list of tags") {
 		return err
 	}
 	return nil
@@ -524,7 +765,7 @@ func agentExists(agent Agent, agents Agents) bool {
 	return agentWasCreated
 }
 
-func labsExists(lab Lab, labs Labs) bool {
+func labExists(lab Lab, labs Labs) bool {
 	labWasCreated := false
 	for _, currLab := range labs {
 		if currLab.Id == lab.Id {
@@ -535,7 +776,7 @@ func labsExists(lab Lab, labs Labs) bool {
 	return labWasCreated
 }
 
-func engineExist(engine Engine, engines Engines) bool {
+func engineExists(engine Engine, engines Engines) bool {
 	engineWasCreated := false
 	for _, currEngine := range engines {
 		if currEngine.Id == engine.Id {
@@ -546,7 +787,7 @@ func engineExist(engine Engine, engines Engines) bool {
 	return engineWasCreated
 }
 
-func endpointExist(endpoint Endpoint, endpoints Endpoints) bool {
+func endpointExists(endpoint Endpoint, endpoints Endpoints) bool {
 	endpointWasCreated := false
 	for _, currEndpoint := range endpoints {
 		if currEndpoint.Id == endpoint.Id {
@@ -556,7 +797,7 @@ func endpointExist(endpoint Endpoint, endpoints Endpoints) bool {
 	}
 	return endpointWasCreated
 }
-func userExist(user User, users Users) bool {
+func userExists(user User, users Users) bool {
 	userWasCreated := false
 	for _, currUser := range users {
 		if currUser.Id == user.Id {
@@ -565,4 +806,14 @@ func userExist(user User, users Users) bool {
 		}
 	}
 	return userWasCreated
+}
+func tagExists(tag Tag, tags Tags) bool {
+	tagWasCreated := false
+	for _, currTag := range tags {
+		if currTag.Id == tag.Id {
+			tagWasCreated = true
+			break
+		}
+	}
+	return tagWasCreated
 }

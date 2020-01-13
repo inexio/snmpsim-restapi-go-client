@@ -493,6 +493,113 @@ func TestManagementClient_UploadRecordFileString_DeleteRecordFile(t *testing.T) 
 	*/
 }
 
+func TestManagementClient_Tags(t *testing.T) {
+	//Create a new api client
+	client, err := NewManagementClient(configManagementTest.Http.BaseUrl)
+	if !assert.NoError(t, err, "error while creating a new api client") {
+		return
+	}
+	//Set configManagementTest.Http.AuthUsername and password
+	if configManagementTest.Http.AuthUsername != "" && configManagementTest.Http.AuthPassword != "" {
+		err = client.SetUsernameAndPassword(configManagementTest.Http.AuthUsername, configManagementTest.Http.AuthPassword)
+		if !assert.NoError(t, err, "error while creating a new api client") {
+			return
+		}
+	}
+
+	tag, err := createTagAndCheckForSuccess(t, client, "TestManagementClient_Tags", "TestManagementClient_Tags")
+	if err != nil {
+		return
+	}
+	defer func() {
+		_ = deleteTagAndCheckForSuccess(t, client, tag)
+	}()
+
+	//lab
+	lab, err := createLabAndCheckForSuccess(t, client, "TestManagementClient_Tags")
+	if err != nil {
+		return
+	}
+	defer func() {
+		_ = deleteLabAndCheckForSuccess(t, client, lab)
+	}()
+
+	err = addTagToLabAndCheckForSuccess(t, client, lab, tag)
+	if err != nil {
+		return
+	}
+	defer func() {
+		_ = removeTagFromLabAndCheckForSuccess(t, client, lab, tag)
+	}()
+
+	//agent
+	agent, err := createAgentAndCheckForSuccess(t, client, "TestManagementClient_Tags", "TestManagementClient_Tags")
+	if err != nil {
+		return
+	}
+	defer func() {
+		_ = deleteAgentAndCheckForSuccess(t, client, agent)
+	}()
+
+	err = addTagToAgentAndCheckForSuccess(t, client, agent, tag)
+	if err != nil {
+		return
+	}
+	defer func() {
+		_ = removeTagFromAgentAndCheckForSuccess(t, client, agent, tag)
+	}()
+
+	//endpoint
+	endpoint, err := createEndpointAndCheckForSuccess(t, client, "TestManagementClient_Tags", configManagementTest.Agent1.EndpointAddress+":"+strconv.Itoa(configManagementTest.Agent1.EndpointPort[0]), configManagementTest.Protocol)
+	if err != nil {
+		return
+	}
+	defer func() {
+		_ = deleteEndpointAndCheckForSuccess(t, client, endpoint)
+	}()
+
+	err = addTagToEndpointAndCheckForSuccess(t, client, endpoint, tag)
+	if err != nil {
+		return
+	}
+	defer func() {
+		_ = removeTagFromEndpointAndCheckForSuccess(t, client, endpoint, tag)
+	}()
+
+	//engine
+	engine, err := createEngineAndCheckForSuccess(t, client, "TestManagementClient_Tags", "010203040507080E")
+	if err != nil {
+		return
+	}
+	defer func() {
+		_ = deleteEngineAndCheckForSuccess(t, client, engine)
+	}()
+
+	err = addTagToEngineAndCheckForSuccess(t, client, engine, tag)
+	if err != nil {
+		return
+	}
+	defer func() {
+		_ = removeTagFromEngineAndCheckForSuccess(t, client, engine, tag)
+	}()
+
+	//user
+	user, err := createUserAndCheckForSuccess(t, client, "TestManagementClient_Tags", "TestManagementClient_Tags", "", "", "", "")
+	if err != nil {
+		return
+	}
+	defer func() {
+		_ = deleteUserAndCheckForSuccess(t, client, user)
+	}()
+	err = addTagToUserAndCheckForSuccess(t, client, user, tag)
+	if err != nil {
+		return
+	}
+	defer func() {
+		_ = removeTagFromUserAndCheckForSuccess(t, client, user, tag)
+	}()
+}
+
 func TestManagementClient_Search(t *testing.T) {
 	//Create a new api client
 	client, err := NewManagementClient(configManagementTest.Http.BaseUrl)
@@ -1279,7 +1386,7 @@ func TestManagementClient_User_Failures(t *testing.T) {
 	}
 	defer func() { _ = deleteUserAndCheckForSuccess(t, client, user) }()
 
-	_, err = client.CreateUser("test-User_Failures-user1", "test-User_Failures-user1", "", "", "", "")
+	_, err = client.CreateUserWithTag("test-User_Failures-user1", "test-User_Failures-user1", "", "", "", "", configManagementTest.TestTagId)
 	if assert.Error(t, err, "no error when creating a user twice") {
 		if err, ok := err.(HttpError); assert.True(t, ok, "error is not a http error", err.Error()) {
 			assert.True(t, err.StatusCode == 400, "error != 400")
@@ -1302,7 +1409,7 @@ func TestManagementClient_Endpoint_Failures(t *testing.T) {
 	}
 
 	//Create Endpoint with invalid input
-	_, err = client.CreateEndpoint("test-Endpoint_Failures-endpoint1", "noAddress", "no valid protocol")
+	_, err = client.CreateEndpointWithTag("test-Endpoint_Failures-endpoint1", "noAddress", "no valid protocol", configManagementTest.TestTagId)
 	if assert.Error(t, err, "no error when an endpoint with invalid params was created") {
 		if err, ok := err.(HttpError); assert.True(t, ok, "error is not a http error", err.Error()) {
 			assert.True(t, err.StatusCode == 400, "error != 400")

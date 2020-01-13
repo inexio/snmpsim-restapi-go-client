@@ -13,6 +13,7 @@ type Lab struct {
 	Name   string `json:"name"`
 	Agents Agents `json:"agents"`
 	Power  string `json:"power"`
+	Tags   Tags   `json:"tags"`
 }
 
 /*
@@ -30,6 +31,7 @@ type Engine struct {
 	Agents    Agents    `json:"agents"`
 	Endpoints Endpoints `json:"endpoints"`
 	Users     Users     `json:"users"`
+	Tags      Tags      `json:"tags"`
 }
 
 /*
@@ -48,6 +50,7 @@ type Agent struct {
 	Labs      Labs      `json:"labs"`
 	Selectors Selectors `json:"selectors"`
 	DataDir   string    `json:"data_dir"`
+	Tags      Tags      `json:"tags"`
 }
 
 /*
@@ -64,6 +67,7 @@ type Endpoint struct {
 	Name     string  `json:"name"`
 	Protocol string  `json:"protocol"`
 	Address  string  `json:"address"`
+	Tags     Tags    `json:"tags"`
 }
 
 /*
@@ -97,6 +101,7 @@ type User struct {
 	PrivKey   string  `json:"priv_key"`
 	PrivProto string  `json:"priv_proto"`
 	User      string  `json:"user"`
+	Tags      Tags    `json:"tags"`
 }
 
 //TODO: not implemented int the api yet, there is only one default selector for snmpv2c and one for snmpv3.
@@ -121,6 +126,7 @@ type Selector struct {
 	Id       int    `json:"id"`
 	Comment  string `json:"comment"`
 	Template string `json:"template"`
+	Tags     Tags   `json:"tags"`
 }
 
 /*
@@ -198,3 +204,23 @@ type Variation struct {
 Variations is an array of variations.
 */
 type Variations []Variation
+
+/*
+Tag - tags a collection of SNMP simulator control plane resources
+*/
+type Tag struct {
+	Id          int       `json:"id"`
+	Name        string    `json:"name"`
+	Description string    `json:"description"`
+	Agents      Agents    `json:"agents"`
+	Endpoints   Endpoints `json:"endpoints"`
+	Engines     Engines   `json:"engines"`
+	Labs        Labs      `json:"labs"`
+	Selectors   Selectors `json:"selectors"`
+	Users       Users     `json:"users"`
+}
+
+/*
+Tags is an array of tags.
+*/
+type Tags []Tag

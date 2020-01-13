@@ -15,3 +15,5 @@ agent2:
     - 6667
 
 rootDataDir: "management-api-test/"
+
+testTag: "management-api-test"

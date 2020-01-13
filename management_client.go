@@ -89,15 +89,41 @@ func (c *ManagementClient) GetLab(id int) (Lab, error) {
 CreateLab creates a new lab.
 */
 func (c *ManagementClient) CreateLab(name string) (Lab, error) {
+	return c.createLab(&name, nil)
+}
+
+/*
+CreateLabWithTag creates a new lab tagged with the given tag.
+*/
+func (c *ManagementClient) CreateLabWithTag(name string, tagId int) (Lab, error) {
+	return c.createLab(&name, &tagId)
+}
+
+func (c *ManagementClient) createLab(name *string, tagId *int) (Lab, error) {
 	if !c.isValid() {
 		return Lab{}, &NotValidError{}
 	}
 
-	if name == "" {
+	if *name == "" {
 		return Lab{}, errors.New("invalid name")
 	}
 
-	response, err := c.request("POST", mgmtEndpointPath+"labs", `{"name":"`+name+`"}`, nil, nil)
+	type requestParams struct {
+		Name string `json:"name"`
+	}
+
+	params := requestParams{*name}
+	jsonString, err := json.Marshal(params)
+	if err != nil {
+		return Lab{}, errors.Wrap(err, "error during marshal")
+	}
+
+	path := mgmtEndpointPath + "labs"
+	if tagId != nil {
+		path = mgmtEndpointPath + "tags/" + strconv.Itoa(*tagId) + "/lab"
+	}
+
+	response, err := c.request("POST", path, string(jsonString), nil, nil)
 
 	if err != nil {
 		return Lab{}, errors.Wrap(err, "error during add lab request")
@@ -199,6 +225,42 @@ func (c *ManagementClient) SetLabPower(labId int, power bool) error {
 }
 
 /*
+AddTagToLab adds a tag to a lab.
+*/
+func (c *ManagementClient) AddTagToLab(labId, tagId int) error {
+	if !c.isValid() {
+		return &NotValidError{}
+	}
+	response, err := c.request("PUT", mgmtEndpointPath+"tags/"+strconv.Itoa(tagId)+"/lab/"+strconv.Itoa(labId), "", nil, nil)
+	if err != nil {
+		return errors.Wrap(err, "error during request")
+	}
+
+	if response.StatusCode() != 200 {
+		return getHttpError(response)
+	}
+	return nil
+}
+
+/*
+RemoveTagFromLab removes a tag from a lab.
+*/
+func (c *ManagementClient) RemoveTagFromLab(labId, tagId int) error {
+	if !c.isValid() {
+		return &NotValidError{}
+	}
+	response, err := c.request("DELETE", mgmtEndpointPath+"tags/"+strconv.Itoa(tagId)+"/lab/"+strconv.Itoa(labId), "", nil, nil)
+	if err != nil {
+		return errors.Wrap(err, "error during request")
+	}
+
+	if response.StatusCode() != 200 {
+		return getHttpError(response)
+	}
+	return nil
+}
+
+/*
 ENGINES
 */
 
@@ -212,7 +274,7 @@ func (c *ManagementClient) GetEngines(filter map[string]string) (Engines, error)
 
 	response, err := c.request("GET", mgmtEndpointPath+"engines", "", nil, filter)
 	if err != nil {
-		return nil, errors.Wrap(err, "error during search engines request")
+		return nil, errors.Wrap(err, "error during get engines request")
 	}
 	if response.StatusCode() != 200 {
 		return nil, getHttpError(response)
@@ -254,16 +316,27 @@ func (c *ManagementClient) GetEngine(id int) (Engine, error) {
 CreateEngine creates a new engine.
 */
 func (c *ManagementClient) CreateEngine(name, engineId string) (Engine, error) {
+	return c.createEngine(&name, &engineId, nil)
+}
+
+/*
+CreateEngineWithTag creates a new engine tagged with the given tag.
+*/
+func (c *ManagementClient) CreateEngineWithTag(name, engineId string, tagId int) (Engine, error) {
+	return c.createEngine(&name, &engineId, &tagId)
+}
+
+func (c *ManagementClient) createEngine(name, engineId *string, tagId *int) (Engine, error) {
 	if !c.isValid() {
 		return Engine{}, &NotValidError{}
 	}
-	if name == "" {
+	if *name == "" {
 		return Engine{}, errors.New("invalid name")
 	}
 
 	//TODO: engine id should be removed! it should always be auto generated!
-	if engineId == "" {
-		engineId = "auto"
+	if *engineId == "" {
+		*engineId = "auto"
 	}
 
 	type requestParams struct {
@@ -271,13 +344,18 @@ func (c *ManagementClient) CreateEngine(name, engineId string) (Engine, error) {
 		EngineId string `json:"engine_id"`
 	}
 
-	params := requestParams{name, engineId}
+	params := requestParams{*name, *engineId}
 	jsonString, err := json.Marshal(params)
 	if err != nil {
 		return Engine{}, errors.Wrap(err, "error during marshal")
 	}
 
-	response, err := c.request("POST", mgmtEndpointPath+"engines", string(jsonString), nil, nil)
+	path := mgmtEndpointPath + "engines"
+	if tagId != nil {
+		path = mgmtEndpointPath + "tags/" + strconv.Itoa(*tagId) + "/engine"
+	}
+
+	response, err := c.request("POST", path, string(jsonString), nil, nil)
 	if err != nil {
 		return Engine{}, errors.Wrap(err, "error during request")
 	}
@@ -390,6 +468,42 @@ func (c *ManagementClient) RemoveEndpointFromEngine(engineId, endpointId int) er
 }
 
 /*
+AddTagToEngine adds a tag to a engine.
+*/
+func (c *ManagementClient) AddTagToEngine(engineId, tagId int) error {
+	if !c.isValid() {
+		return &NotValidError{}
+	}
+	response, err := c.request("PUT", mgmtEndpointPath+"tags/"+strconv.Itoa(tagId)+"/engine/"+strconv.Itoa(engineId), "", nil, nil)
+	if err != nil {
+		return errors.Wrap(err, "error during request")
+	}
+
+	if response.StatusCode() != 200 {
+		return getHttpError(response)
+	}
+	return nil
+}
+
+/*
+RemoveTagFromEngine removes a tag from a engine.
+*/
+func (c *ManagementClient) RemoveTagFromEngine(engineId, tagId int) error {
+	if !c.isValid() {
+		return &NotValidError{}
+	}
+	response, err := c.request("DELETE", mgmtEndpointPath+"tags/"+strconv.Itoa(tagId)+"/engine/"+strconv.Itoa(engineId), "", nil, nil)
+	if err != nil {
+		return errors.Wrap(err, "error during request")
+	}
+
+	if response.StatusCode() != 200 {
+		return getHttpError(response)
+	}
+	return nil
+}
+
+/*
 AGENTS
 */
 
@@ -403,7 +517,7 @@ func (c *ManagementClient) GetAgents(filters map[string]string) (Agents, error) 
 
 	response, err := c.request("GET", mgmtEndpointPath+"agents", "", nil, filters)
 	if err != nil {
-		return nil, errors.Wrap(err, "error during search agents request")
+		return nil, errors.Wrap(err, "error during get agents request")
 	}
 	if response.StatusCode() != 200 {
 		return nil, getHttpError(response)
@@ -445,16 +559,27 @@ func (c *ManagementClient) GetAgent(id int) (Agent, error) {
 CreateAgent creates a new agent.
 */
 func (c *ManagementClient) CreateAgent(name, dataDir string) (Agent, error) {
+	return c.createAgent(&name, &dataDir, nil)
+}
+
+/*
+CreateAgentWithTag creates a new agent tagged with the given tag.
+*/
+func (c *ManagementClient) CreateAgentWithTag(name, dataDir string, tagId int) (Agent, error) {
+	return c.createAgent(&name, &dataDir, &tagId)
+}
+
+func (c *ManagementClient) createAgent(name, dataDir *string, tagId *int) (Agent, error) {
 	if !c.isValid() {
 		return Agent{}, &NotValidError{}
 	}
 
-	if name == "" {
+	if *name == "" {
 		return Agent{}, errors.New("invalid name")
 	}
 
-	if dataDir == "" {
-		dataDir = "."
+	if *dataDir == "" {
+		*dataDir = "."
 	}
 
 	type requestParams struct {
@@ -462,13 +587,18 @@ func (c *ManagementClient) CreateAgent(name, dataDir string) (Agent, error) {
 		DataDir string `json:"data_dir"`
 	}
 
-	params := requestParams{name, dataDir}
+	params := requestParams{*name, *dataDir}
 	jsonString, err := json.Marshal(params)
 	if err != nil {
 		return Agent{}, errors.Wrap(err, "error during marshal")
 	}
 
-	response, err := c.request("POST", mgmtEndpointPath+"agents", string(jsonString), nil, nil)
+	path := mgmtEndpointPath + "agents"
+	if tagId != nil {
+		path = mgmtEndpointPath + "tags/" + strconv.Itoa(*tagId) + "/agent"
+	}
+
+	response, err := c.request("POST", path, string(jsonString), nil, nil)
 	if err != nil {
 		return Agent{}, errors.Wrap(err, "error during request")
 	}
@@ -559,6 +689,42 @@ func (c *ManagementClient) RemoveSelectorFromAgent(agentId, selectorId int) (Age
 }
 
 /*
+AddTagToAgent adds a tag to a agent.
+*/
+func (c *ManagementClient) AddTagToAgent(agentId, tagId int) error {
+	if !c.isValid() {
+		return &NotValidError{}
+	}
+	response, err := c.request("PUT", mgmtEndpointPath+"tags/"+strconv.Itoa(tagId)+"/agent/"+strconv.Itoa(agentId), "", nil, nil)
+	if err != nil {
+		return errors.Wrap(err, "error during request")
+	}
+
+	if response.StatusCode() != 200 {
+		return getHttpError(response)
+	}
+	return nil
+}
+
+/*
+RemoveTagFromAgent removes a tag from a agent.
+*/
+func (c *ManagementClient) RemoveTagFromAgent(agentId, tagId int) error {
+	if !c.isValid() {
+		return &NotValidError{}
+	}
+	response, err := c.request("DELETE", mgmtEndpointPath+"tags/"+strconv.Itoa(tagId)+"/agent/"+strconv.Itoa(agentId), "", nil, nil)
+	if err != nil {
+		return errors.Wrap(err, "error during request")
+	}
+
+	if response.StatusCode() != 200 {
+		return getHttpError(response)
+	}
+	return nil
+}
+
+/*
 ENDPOINTS
 */
 
@@ -572,7 +738,7 @@ func (c *ManagementClient) GetEndpoints(filters map[string]string) (Endpoints, e
 
 	response, err := c.request("GET", mgmtEndpointPath+"endpoints", "", nil, filters)
 	if err != nil {
-		return nil, errors.Wrap(err, "error during search endpoints request")
+		return nil, errors.Wrap(err, "error during get endpoints request")
 	}
 	if response.StatusCode() != 200 {
 		return nil, getHttpError(response)
@@ -614,19 +780,30 @@ func (c *ManagementClient) GetEndpoint(id int) (Endpoint, error) {
 CreateEndpoint creates a new endpoint.
 */
 func (c *ManagementClient) CreateEndpoint(name, address, protocol string) (Endpoint, error) {
+	return c.createEndpoint(&name, &address, &protocol, nil)
+}
+
+/*
+CreateEndpointWithTag creates a new endpoint tagged with the given tag.
+*/
+func (c *ManagementClient) CreateEndpointWithTag(name, address, protocol string, tagId int) (Endpoint, error) {
+	return c.createEndpoint(&name, &address, &protocol, &tagId)
+}
+
+func (c *ManagementClient) createEndpoint(name, address, protocol *string, tagId *int) (Endpoint, error) {
 	if !c.isValid() {
 		return Endpoint{}, &NotValidError{}
 	}
 
-	if name == "" {
+	if *name == "" {
 		return Endpoint{}, errors.New("invalid name")
 	}
 
-	if protocol == "" {
-		protocol = "udpv4"
+	if *protocol == "" {
+		*protocol = "udpv4"
 	}
 
-	if address == "" {
+	if *address == "" {
 		return Endpoint{}, errors.New("invalid address")
 	}
 
@@ -636,13 +813,18 @@ func (c *ManagementClient) CreateEndpoint(name, address, protocol string) (Endpo
 		Protocol string `json:"protocol"`
 	}
 
-	params := requestParams{name, address, protocol}
+	params := requestParams{*name, *address, *protocol}
 	jsonString, err := json.Marshal(params)
 	if err != nil {
 		return Endpoint{}, errors.Wrap(err, "error during marshal")
 	}
 
-	response, err := c.request("POST", mgmtEndpointPath+"endpoints", string(jsonString), nil, nil)
+	path := mgmtEndpointPath + "endpoints"
+	if tagId != nil {
+		path = mgmtEndpointPath + "tags/" + strconv.Itoa(*tagId) + "/endpoint"
+	}
+
+	response, err := c.request("POST", path, string(jsonString), nil, nil)
 
 	if err != nil {
 		return Endpoint{}, errors.Wrap(err, "error during request")
@@ -672,6 +854,42 @@ func (c *ManagementClient) DeleteEndpoint(id int) error {
 		return errors.Wrap(err, "error during request")
 	}
 	if response.StatusCode() != 204 {
+		return getHttpError(response)
+	}
+	return nil
+}
+
+/*
+AddTagToEndpoint adds a tag to a endpoint.
+*/
+func (c *ManagementClient) AddTagToEndpoint(endpointId, tagId int) error {
+	if !c.isValid() {
+		return &NotValidError{}
+	}
+	response, err := c.request("PUT", mgmtEndpointPath+"tags/"+strconv.Itoa(tagId)+"/endpoint/"+strconv.Itoa(endpointId), "", nil, nil)
+	if err != nil {
+		return errors.Wrap(err, "error during request")
+	}
+
+	if response.StatusCode() != 200 {
+		return getHttpError(response)
+	}
+	return nil
+}
+
+/*
+RemoveTagFromEndpoint removes a tag from a endpoint.
+*/
+func (c *ManagementClient) RemoveTagFromEndpoint(endpointId, tagId int) error {
+	if !c.isValid() {
+		return &NotValidError{}
+	}
+	response, err := c.request("DELETE", mgmtEndpointPath+"tags/"+strconv.Itoa(tagId)+"/endpoint/"+strconv.Itoa(endpointId), "", nil, nil)
+	if err != nil {
+		return errors.Wrap(err, "error during request")
+	}
+
+	if response.StatusCode() != 200 {
 		return getHttpError(response)
 	}
 	return nil
@@ -785,23 +1003,34 @@ USERS
 CreateUser creates a new user.
 */
 func (c *ManagementClient) CreateUser(user, name, authKey, authProto, privKey, privProto string) (User, error) {
+	return c.createUser(&user, &name, &authKey, &authProto, &privKey, &privProto, nil)
+}
+
+/*
+CreateUserWithTag creates a new user tagged with the given tag.
+*/
+func (c *ManagementClient) CreateUserWithTag(user, name, authKey, authProto, privKey, privProto string, tagId int) (User, error) {
+	return c.createUser(&user, &name, &authKey, &authProto, &privKey, &privProto, &tagId)
+}
+
+func (c *ManagementClient) createUser(user, name, authKey, authProto, privKey, privProto *string, tagId *int) (User, error) {
 	if !c.isValid() {
 		return User{}, &NotValidError{}
 	}
 
-	if name == "" {
+	if *name == "" {
 		return User{}, errors.New("invalid name")
 	}
 
-	if user == "" {
+	if *user == "" {
 		return User{}, errors.New("invalid user")
 	}
 
-	if authProto == "" {
-		authProto = "none"
+	if *authProto == "" {
+		*authProto = "none"
 	}
-	if privProto == "" {
-		privProto = "none"
+	if *privProto == "" {
+		*privProto = "none"
 	}
 
 	type requestParams struct {
@@ -814,22 +1043,22 @@ func (c *ManagementClient) CreateUser(user, name, authKey, authProto, privKey, p
 	}
 
 	params := requestParams{
-		User:      user,
-		Name:      name,
-		AuthProto: authProto,
-		PrivProto: privProto,
+		User:      *user,
+		Name:      *name,
+		AuthProto: *authProto,
+		PrivProto: *privProto,
 	}
 
-	if authKey == "" {
+	if *authKey == "" {
 		params.AuthKey = nil
 	} else {
-		params.AuthKey = &authKey
+		params.AuthKey = authKey
 	}
 
-	if privKey == "" {
+	if *privKey == "" {
 		params.PrivKey = nil
 	} else {
-		params.PrivKey = &privKey
+		params.PrivKey = privKey
 	}
 
 	jsonString, err := json.Marshal(params)
@@ -837,7 +1066,12 @@ func (c *ManagementClient) CreateUser(user, name, authKey, authProto, privKey, p
 		return User{}, errors.Wrap(err, "error during marshal")
 	}
 
-	response, err := c.request("POST", mgmtEndpointPath+"users", string(jsonString), nil, nil)
+	path := mgmtEndpointPath + "users"
+	if tagId != nil {
+		path = mgmtEndpointPath + "tags/" + strconv.Itoa(*tagId) + "/user"
+	}
+
+	response, err := c.request("POST", path, string(jsonString), nil, nil)
 	if err != nil {
 		return User{}, errors.Wrap(err, "error during request")
 	}
@@ -854,7 +1088,7 @@ func (c *ManagementClient) CreateUser(user, name, authKey, authProto, privKey, p
 }
 
 /*
-GetUsers returns a list of users, optionally fitlered.
+GetUsers returns a list of users, optionally filtered.
 */
 func (c *ManagementClient) GetUsers(filters map[string]string) (Users, error) {
 	if !c.isValid() {
@@ -863,7 +1097,7 @@ func (c *ManagementClient) GetUsers(filters map[string]string) (Users, error) {
 
 	response, err := c.request("GET", mgmtEndpointPath+"users", "", nil, filters)
 	if err != nil {
-		return nil, errors.Wrap(err, "error during search users request")
+		return nil, errors.Wrap(err, "error during get users request")
 	}
 	if response.StatusCode() != 200 {
 		return nil, getHttpError(response)
@@ -920,6 +1154,42 @@ func (c *ManagementClient) DeleteUser(id int) error {
 }
 
 /*
+AddTagToUser adds a tag to a user.
+*/
+func (c *ManagementClient) AddTagToUser(userId, tagId int) error {
+	if !c.isValid() {
+		return &NotValidError{}
+	}
+	response, err := c.request("PUT", mgmtEndpointPath+"tags/"+strconv.Itoa(tagId)+"/user/"+strconv.Itoa(userId), "", nil, nil)
+	if err != nil {
+		return errors.Wrap(err, "error during request")
+	}
+
+	if response.StatusCode() != 200 {
+		return getHttpError(response)
+	}
+	return nil
+}
+
+/*
+RemoveTagFromUser removes a tag from a user.
+*/
+func (c *ManagementClient) RemoveTagFromUser(userId, tagId int) error {
+	if !c.isValid() {
+		return &NotValidError{}
+	}
+	response, err := c.request("DELETE", mgmtEndpointPath+"tags/"+strconv.Itoa(tagId)+"/user/"+strconv.Itoa(userId), "", nil, nil)
+	if err != nil {
+		return errors.Wrap(err, "error during request")
+	}
+
+	if response.StatusCode() != 200 {
+		return getHttpError(response)
+	}
+	return nil
+}
+
+/*
 SELECTORS
 */
 //TODO: Not implemented yet in api, there is always a default selector for snmp v2c and v3. This has to be implemented when its possible to configure own selectors.
@@ -954,4 +1224,129 @@ DeleteSelector deletes the selector with the given id.
 func (c *ManagementClient) DeleteSelector(id int) error {
 	//TODO: Not implemented yet!!! This also isnt implemented in the api so we have to wait until its ready.
 	return errors.New("Not implemented yet")
+}
+
+/*
+ TAGS
+*/
+
+/*
+CreateTag creates a new tag.
+*/
+func (c *ManagementClient) CreateTag(name, description string) (Tag, error) {
+	if !c.isValid() {
+		return Tag{}, &NotValidError{}
+	}
+	if name == "" {
+		return Tag{}, errors.New("invalid name")
+	}
+
+	type requestParams struct {
+		Name        string `json:"name"`
+		Description string `json:"description"`
+	}
+
+	params := requestParams{name, description}
+	jsonString, err := json.Marshal(params)
+	if err != nil {
+		return Tag{}, errors.Wrap(err, "error during marshal")
+	}
+
+	response, err := c.request("POST", mgmtEndpointPath+"tags", string(jsonString), nil, nil)
+	if err != nil {
+		return Tag{}, errors.Wrap(err, "error during request")
+	}
+	if response.StatusCode() != 201 {
+		return Tag{}, getHttpError(response)
+	}
+
+	var tag Tag
+	err = json.Unmarshal(response.Body(), &tag)
+	if err != nil {
+		return Tag{}, errors.Wrap(err, "error during unmarshalling http response")
+	}
+	return tag, nil
+}
+
+/*
+GetTag returns the lab with the given id.
+*/
+func (c *ManagementClient) GetTag(id int) (Tag, error) {
+	if !c.isValid() {
+		return Tag{}, &NotValidError{}
+	}
+
+	response, err := c.request("GET", mgmtEndpointPath+"tags/"+strconv.Itoa(id), "", nil, nil)
+	if err != nil {
+		return Tag{}, errors.Wrap(err, "error during get tags request")
+	}
+	if response.StatusCode() != 200 {
+		return Tag{}, getHttpError(response)
+	}
+
+	var tag Tag
+	err = json.Unmarshal(response.Body(), &tag)
+	if err != nil {
+		return Tag{}, errors.Wrap(err, "error during unmarshalling http response")
+	}
+	return tag, nil
+}
+
+/*
+GetTags returns a list of users, optionally filtered.
+*/
+func (c *ManagementClient) GetTags(filters map[string]string) (Tags, error) {
+	if !c.isValid() {
+		return nil, &NotValidError{}
+	}
+
+	response, err := c.request("GET", mgmtEndpointPath+"tags", "", nil, filters)
+	if err != nil {
+		return nil, errors.Wrap(err, "error during get users request")
+	}
+	if response.StatusCode() != 200 {
+		return nil, getHttpError(response)
+	}
+
+	var tags Tags
+	err = json.Unmarshal(response.Body(), &tags)
+	if err != nil {
+		return nil, errors.Wrap(err, "error during unmarshalling http response")
+	}
+	return tags, nil
+}
+
+/*
+DeleteTag deletes the tag with the given id.
+*/
+func (c *ManagementClient) DeleteTag(id int) error {
+	if !c.isValid() {
+		return &NotValidError{}
+	}
+
+	response, err := c.request("DELETE", mgmtEndpointPath+"tags/"+strconv.Itoa(id), "", nil, nil)
+	if err != nil {
+		return errors.Wrap(err, "error during request")
+	}
+	if response.StatusCode() != 204 {
+		return getHttpError(response)
+	}
+	return nil
+}
+
+/*
+DeleteAllObjectsWithTag deletes all objects with the given tag.
+*/
+func (c *ManagementClient) DeleteAllObjectsWithTag(tagId int) error {
+	if !c.isValid() {
+		return &NotValidError{}
+	}
+	response, err := c.request("DELETE", mgmtEndpointPath+"tags/"+strconv.Itoa(tagId)+"/objects", "", nil, nil)
+	if err != nil {
+		return errors.Wrap(err, "error during request")
+	}
+	if response.StatusCode() != 200 {
+		return getHttpError(response)
+	}
+	return nil
 }
