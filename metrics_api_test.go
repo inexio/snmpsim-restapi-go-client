@@ -257,8 +257,8 @@ func TestMetricsClient_BuildUpSetupAndTestMetrics(t *testing.T) {
 		}
 	}
 
-	packets, err := metricsClient.GetPacketMetrics(nil)
-	if assert.NoError(t, err, "error during GetPacketMetrics") {
+	packets, err := metricsClient.GetPackets(nil)
+	if assert.NoError(t, err, "error during GetPackets") {
 		assert.True(t, *packets.Total > 10000, "less than 10000 packets, packets: "+strconv.FormatInt(*packets.Total, 10))
 		assert.True(t, *packets.AuthFailures == 0, "more than 0 auth failures, auth failures: "+strconv.FormatInt(*packets.AuthFailures, 10))
 		assert.True(t, *packets.ParseFailures == 0, "more than 0 parse failures, parse failures: "+strconv.FormatInt(*packets.ParseFailures, 10))
@@ -267,16 +267,16 @@ func TestMetricsClient_BuildUpSetupAndTestMetrics(t *testing.T) {
 
 	filters := make(map[string]string)
 	filters["local_address"] = address1
-	packetsAddr1, errAddr1 := metricsClient.GetPacketMetrics(filters)
-	if assert.NoError(t, errAddr1, "error during GetPacketMetrics for addr1") {
+	packetsAddr1, errAddr1 := metricsClient.GetPackets(filters)
+	if assert.NoError(t, errAddr1, "error during GetPackets for addr1") {
 		assert.True(t, *packetsAddr1.Total <= *packets.Total, "filtered packet requests returned more total requests than request for all packets")
 		assert.True(t, *packetsAddr1.AuthFailures <= *packets.AuthFailures, "filtered packet requests returned more auth failures than request for all packets")
 		assert.True(t, *packetsAddr1.ParseFailures <= *packets.ParseFailures, "more than 0 parse failures, parse failures: "+strconv.FormatInt(*packets.ParseFailures, 10))
 		assert.True(t, *packetsAddr1.ContextFailures <= *packets.ContextFailures, "more than 0 context failures, context failures: "+strconv.FormatInt(*packets.ContextFailures, 10))
 	}
 	filters["local_address"] = address2
-	packetsAddr2, errAddr2 := metricsClient.GetPacketMetrics(filters)
-	if assert.NoError(t, errAddr2, "error during GetPacketMetrics for addr2") {
+	packetsAddr2, errAddr2 := metricsClient.GetPackets(filters)
+	if assert.NoError(t, errAddr2, "error during GetPackets for addr2") {
 		assert.True(t, *packetsAddr2.Total <= *packets.Total, "filtered packet requests returned more total requests than request for all packets")
 		assert.True(t, *packetsAddr2.AuthFailures <= *packets.AuthFailures, "filtered packet requests returned more auth failures than request for all packets")
 		assert.True(t, *packetsAddr2.ParseFailures <= *packets.ParseFailures, "filtered packet requests returned more parse failures than request for all packets")
@@ -286,24 +286,24 @@ func TestMetricsClient_BuildUpSetupAndTestMetrics(t *testing.T) {
 		assert.True(t, *packetsAddr1.Total <= *packetsAddr2.Total, "endpoint with less incoming packet requests returned more total packets than endpoint with more requests")
 	}
 
-	messages, err := metricsClient.GetMessageMetrics(nil)
-	if assert.NoError(t, err, "error during GetMessageMetrics") {
+	messages, err := metricsClient.GetMessages(nil)
+	if assert.NoError(t, err, "error during GetMessages") {
 		assert.True(t, *messages.Pdus > 10000 && *messages.VarBinds > 10000, "there are less than 10000 pdus and var binds, pdus: "+strconv.FormatInt(*messages.Pdus, 10)+", var binds: "+strconv.FormatInt(*messages.VarBinds, 10))
 		assert.True(t, *messages.Failures == 0, "there are failures, failures: "+strconv.FormatInt(*messages.Failures, 10))
 	}
 
 	filters = make(map[string]string)
 	filters["local_address"] = address1
-	messagesAddr1, errAddr1 := metricsClient.GetMessageMetrics(filters)
-	if assert.NoError(t, errAddr1, "error during GetMessageMetrics for addr1") {
+	messagesAddr1, errAddr1 := metricsClient.GetMessages(filters)
+	if assert.NoError(t, errAddr1, "error during GetMessages for addr1") {
 		assert.True(t, *messagesAddr1.Pdus <= *messages.Pdus, "filtered message requests returned more pdus than request for all packets")
 		assert.True(t, *messagesAddr1.VarBinds <= *messages.VarBinds, "filtered message requests returned more var binds than request for all packets")
 		assert.True(t, *messagesAddr1.Failures <= *messages.Failures, "filtered message requests returned more failures than request for all packets")
 	}
 
 	filters["local_address"] = address2
-	messagesAddr2, errAddr2 := metricsClient.GetMessageMetrics(filters)
-	if assert.NoError(t, errAddr2, "error during GetMessageMetrics for addr1") {
+	messagesAddr2, errAddr2 := metricsClient.GetMessages(filters)
+	if assert.NoError(t, errAddr2, "error during GetMessages for addr1") {
 		assert.True(t, *messagesAddr2.Pdus <= *messages.Pdus, "filtered message requests returned more pdus than request for all packets")
 		assert.True(t, *messagesAddr2.VarBinds <= *messages.VarBinds, "filtered message requests returned more var binds than request for all packets")
 		assert.True(t, *messagesAddr2.Failures <= *messages.Failures, "filtered message requests returned more failures than request for all packets")
@@ -355,7 +355,7 @@ func requestSender(t *testing.T, wg *sync.WaitGroup, snmpCommunity string) {
 	}()
 	snmpErrCounter := 0
 
-	//TODO: does not work
+	//send snmp requests for 30s
 	for stay, timeout := true, time.After(30*time.Second); stay; {
 		select {
 		case <-timeout:

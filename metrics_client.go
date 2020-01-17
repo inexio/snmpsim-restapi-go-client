@@ -30,9 +30,9 @@ func NewMetricsClient(baseUrl string) (*MetricsClient, error) {
 }
 
 /*
-GetProcessesMetrics returns process metrics.
+GetProcesses returns process metrics.
 */
-func (c *MetricsClient) GetProcessesMetrics(filters map[string]string) (ProcessesMetrics, error) {
+func (c *MetricsClient) GetProcesses(filters map[string]string) (ProcessesMetrics, error) {
 	response, err := c.request("GET", metricsEndpointPath+"processes", "", nil, filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "error during request")
@@ -49,9 +49,9 @@ func (c *MetricsClient) GetProcessesMetrics(filters map[string]string) (Processe
 }
 
 /*
-GetPacketMetrics returns packet metrics.
+GetPackets returns packet metrics.
 */
-func (c *MetricsClient) GetPacketMetrics(filters map[string]string) (PacketMetrics, error) {
+func (c *MetricsClient) GetPackets(filters map[string]string) (PacketMetrics, error) {
 	response, err := c.request("GET", metricsEndpointPath+"activity/packets", "", nil, filters)
 	if err != nil {
 		return PacketMetrics{}, errors.Wrap(err, "error during request")
@@ -108,9 +108,9 @@ func (c *MetricsClient) GetPossibleValuesForPacketFilter(filter string) ([]strin
 }
 
 /*
-GetMessageMetrics returns message metrics.
+GetMessages returns message metrics.
 */
-func (c *MetricsClient) GetMessageMetrics(filters map[string]string) (MessageMetrics, error) {
+func (c *MetricsClient) GetMessages(filters map[string]string) (MessageMetrics, error) {
 	response, err := c.request("GET", metricsEndpointPath+"activity/messages", "", nil, filters)
 	if err != nil {
 		return MessageMetrics{}, errors.Wrap(err, "error during request")
