@@ -139,17 +139,26 @@ type ErrorResponse struct {
 
 /*
 ProcessMetrics - SNMP simulator system is composed of many running processes. This object describes common properties of a process.
-*/
-type ProcessMetrics struct {
+
 	Cmdline   *string           `json:"cmdline"`
 	Uptime    *int              `json:"uptime"`
 	Owner     *string           `json:"owner"`
-	Memory    *int              `json:"memory"`
-	Cpu       *int              `json:"cpu"`
-	Files     *int              `json:"files"`
-	StdOut    *string           `json:"stdout"`
-	StdErr    *string           `json:"stderr"`
-	LifeCycle *ProcessLifeCycle `json:"lifecycle"`
+
+	LifeCycle  	*ProcessLifeCycle	`json:"lifecycle"`
+*/
+type ProcessMetrics struct {
+	Id 				int				`json:"id"`
+	Path       		string			`json:"path"`
+	Runtime    		int				`json:"runtime"`
+	Cpu        		int        		`json:"cpu"`
+	Memory    		int        		`json:"memory"`
+	Files      		int        		`json:"files"`
+	Exits	   		int				`json:"exits"`
+	Changes	   		int				`json:"changes"`
+	UpdateInterval	int				`json:"update_interval"`
+	LastUpdate 		string			`json:"last_update"`
+	ConsolePages	ConsolePages	`json:"console_pages"`
+	Supervisor		Supervisor 		`json:"supervisor"`
 }
 
 /*
@@ -224,3 +233,34 @@ type Tag struct {
 Tags is an array of tags.
 */
 type Tags []Tag
+
+/*
+Console - contains information regarding the console
+*/
+type Console struct {
+	Id			int			`json:"id"`
+	Timestamp   string    	`json:"timestamp"`
+	Text        string    	`json:"text"`
+}
+
+/*
+Consoles is an array of Consoles
+*/
+type Consoles []Console
+
+/*
+ConsolePages - contains information regarding snmpsim consoles
+*/
+type ConsolePages struct {
+	Count		int		`json:"count"`
+	LastUpdate	string	`json:"last_update"`
+}
+
+
+/*
+Supervisor - contains information regarding the supervisor
+*/
+type Supervisor struct {
+	Hostname	string		`json:"hostname"`
+	WatchDir	string		`json:"watch_dir"`
+}

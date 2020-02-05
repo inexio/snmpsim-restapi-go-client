@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/go-resty/resty/v2"
 	"github.com/pkg/errors"
+	"strconv"
 )
 
 /*
@@ -46,6 +47,101 @@ func (c *MetricsClient) GetProcesses(filters map[string]string) (ProcessesMetric
 		return nil, errors.Wrap(err, "error during unmarshalling http response")
 	}
 	return processes, nil
+}
+
+/*
+GetProcess returns the process with the given id.
+*/
+func (c *MetricsClient) GetProcess(id int) (ProcessMetrics, error) {
+	response, err := c.request("GET", metricsEndpointPath+"processes/"+strconv.Itoa(id), "", nil, nil)
+	if err != nil {
+		return ProcessMetrics{}, errors.Wrap(err, "error during request")
+	}
+	if response.StatusCode() != 200 {
+		return ProcessMetrics{}, getHttpError(response)
+	}
+	var process ProcessMetrics
+	err = json.Unmarshal(response.Body(), &process)
+	if err != nil {
+		return ProcessMetrics{}, errors.Wrap(err, "error during unmarshalling http response")
+	}
+	return process, nil
+}
+
+/*
+GetProcessEndpoints returns an array of endpoints for the given process-id.
+*/
+func (c *MetricsClient) GetProcessEndpoints(id int) (Endpoints, error) {
+	response, err := c.request("GET", metricsEndpointPath+"processes/"+strconv.Itoa(id)+"/endpoints", "", nil, nil)
+	if err != nil {
+		return nil, errors.Wrap(err, "error during request")
+	}
+	if response.StatusCode() != 200 {
+		return nil, getHttpError(response)
+	}
+	var endpoints Endpoints
+	err = json.Unmarshal(response.Body(), &endpoints)
+	if err != nil {
+		return nil, errors.Wrap(err, "error during unmarshalling http response")
+	}
+	return endpoints, nil
+}
+
+/*
+GetProcessEndpoint returns the endpoint for the given process- and endpoint-id.
+*/
+func (c *MetricsClient) GetProcessEndpoint(processId int, endpointId int) (Endpoint, error) {
+	response, err := c.request("GET", metricsEndpointPath+"processes/"+strconv.Itoa(processId)+"/endpoints/"+strconv.Itoa(endpointId), "", nil, nil)
+	if err != nil {
+		return Endpoint{}, errors.Wrap(err, "error during request")
+	}
+	if response.StatusCode() != 200 {
+		return Endpoint{}, getHttpError(response)
+	}
+	var endpoint Endpoint
+	err = json.Unmarshal(response.Body(), &endpoint)
+	if err != nil {
+		return Endpoint{}, errors.Wrap(err, "error during unmarshalling http response")
+	}
+	return endpoint, nil
+}
+
+/*
+GetProcessConsolePages returns an array of console-pages for the given process-id.
+*/
+func (c *MetricsClient) GetProcessConsolePages(processId int) (Consoles, error) {
+	response, err := c.request("GET", metricsEndpointPath+"processes/"+strconv.Itoa(processId)+"/console", "", nil, nil)
+	if err != nil {
+		return nil, errors.Wrap(err, "error during request")
+	}
+	if response.StatusCode() != 200 {
+		return nil, getHttpError(response)
+	}
+	var consolePages Consoles
+	err = json.Unmarshal(response.Body(), &consolePages)
+	if err != nil {
+		return nil, errors.Wrap(err, "error during unmarshalling http response")
+	}
+	return consolePages, nil
+}
+
+/*
+GetProcessConsolePage returns the console-pages for the given process- and console-page-id.
+*/
+func (c *MetricsClient) GetProcessConsolePage(processId int, pageId int) (Console, error) {
+	response, err := c.request("GET", metricsEndpointPath+"processes/"+strconv.Itoa(processId)+"/console/"+strconv.Itoa(pageId), "", nil, nil)
+	if err != nil {
+		return Console{}, errors.Wrap(err, "error during request")
+	}
+	if response.StatusCode() != 200 {
+		return Console{}, getHttpError(response)
+	}
+	var consolePages Console
+	err = json.Unmarshal(response.Body(), &consolePages)
+	if err != nil {
+		return Console{}, errors.Wrap(err, "error during unmarshalling http response")
+	}
+	return consolePages, nil
 }
 
 /*
