@@ -315,22 +315,22 @@ func TestMetricsClient_BuildUpSetupAndTestMetrics(t *testing.T) {
 		assert.True(t, *messagesAddr1.VarBinds <= *messagesAddr2.VarBinds, "endpoint with less incoming message requests returned more var binds than endpoint with more requests")
 	}
 
-	filters, err = metricsClient.GetMessageFilters()
+	messageFilters, err := metricsClient.GetMessageFilters()
 	if assert.NoError(t, err, "error during GetMessageFilters") {
-		assert.True(t, len(filters) > 0, "no message filters found")
+		assert.True(t, len(messageFilters) > 0, "no message filters found")
 	}
 	possibleValuesForFilter, err := metricsClient.GetPossibleValuesForMessageFilter("local_address")
 	if assert.NoError(t, err, "error during GetPossibleValuesForMessageFilter") {
 		assert.True(t, len(possibleValuesForFilter) >= 2, "less than 2 values for message filter 'local_address' found")
 	}
 
-	filters, err = metricsClient.GetPacketFilters()
+	packetFilters, err := metricsClient.GetPacketFilters()
 	if assert.NoError(t, err, "error during GetPacketFilters") {
-		assert.True(t, len(filters) > 0, "no packet filters found")
+		assert.True(t, len(packetFilters) > 0, "no packet filters found")
 	}
 	possibleValuesForFilter, err = metricsClient.GetPossibleValuesForPacketFilter("local_address")
 	if assert.NoError(t, err, "error during GetPossibleValuesForPacketFilter") {
-		assert.True(t, len(filters) >= 2, "less than 2 values for packet filter 'local_address' found")
+		assert.True(t, len(possibleValuesForFilter) >= 2, "less than 2 values for packet filter 'local_address' found")
 	}
 }
 

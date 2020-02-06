@@ -166,7 +166,7 @@ func (c *MetricsClient) GetPackets(filters map[string]string) (PacketMetrics, er
 /*
 GetPacketFilters returns all packet filters.
 */
-func (c *MetricsClient) GetPacketFilters() (map[string]string, error) {
+func (c *MetricsClient) GetPacketFilters() (map[string]interface{}, error) {
 	response, err := c.request("GET", metricsEndpointPath+"activity/packets/filters", "", nil, nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "error during request")
@@ -175,7 +175,7 @@ func (c *MetricsClient) GetPacketFilters() (map[string]string, error) {
 		return nil, getHttpError(response)
 	}
 
-	var packetFilters map[string]string
+	var packetFilters map[string]interface{}
 	err = json.Unmarshal(response.Body(), &packetFilters)
 	if err != nil {
 		return nil, errors.Wrap(err, "error during unmarshalling http response")
@@ -225,7 +225,7 @@ func (c *MetricsClient) GetMessages(filters map[string]string) (MessageMetrics, 
 /*
 GetMessageFilters returns all message filters.
 */
-func (c *MetricsClient) GetMessageFilters() (map[string]string, error) {
+func (c *MetricsClient) GetMessageFilters() (map[string]interface{}, error) {
 	response, err := c.request("GET", metricsEndpointPath+"activity/messages/filters", "", nil, nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "error during request")
@@ -234,7 +234,7 @@ func (c *MetricsClient) GetMessageFilters() (map[string]string, error) {
 		return nil, getHttpError(response)
 	}
 
-	var messageFilters map[string]string
+	var messageFilters map[string]interface{}
 	err = json.Unmarshal(response.Body(), &messageFilters)
 	if err != nil {
 		return nil, errors.Wrap(err, "error during unmarshalling http response")
