@@ -121,7 +121,11 @@ func init() {
 		configManagementTest.TestTagId = tags[0].Id
 
 		//delete objects with this text
-		err = client.DeleteAllObjectsWithTag(configManagementTest.TestTagId)
+		_, err = client.DeleteAllObjectsWithTag(configManagementTest.TestTagId)
+		if err != nil {
+			fmt.Println("Error while trying to delete all objects tagged with tag-id", configManagementTest.TestTagId)
+			os.Exit(2)
+		}
 	case 0:
 		//tag not found, this might be legit when the test runs for the first time or the snmpsim db was recreated
 		fmt.Println("No tag for management api test found -> creating a new tag!")

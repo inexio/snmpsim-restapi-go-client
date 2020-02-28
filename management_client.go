@@ -1337,16 +1337,24 @@ func (c *ManagementClient) DeleteTag(id int) error {
 /*
 DeleteAllObjectsWithTag deletes all objects with the given tag.
 */
-func (c *ManagementClient) DeleteAllObjectsWithTag(tagId int) error {
+func (c *ManagementClient) DeleteAllObjectsWithTag(tagId int) (Tag, error) {
 	if !c.isValid() {
-		return &NotValidError{}
+		return Tag{}, &NotValidError{}
 	}
+
 	response, err := c.request("DELETE", mgmtEndpointPath+"tags/"+strconv.Itoa(tagId)+"/objects", "", nil, nil)
 	if err != nil {
-		return errors.Wrap(err, "error during request")
+		return Tag{}, errors.Wrap(err, "error during request")
 	}
 	if response.StatusCode() != 200 {
-		return getHttpError(response)
+		return Tag{}, getHttpError(response)
 	}
-	return nil
+
+	var tag Tag
+	err = json.Unmarshal(response.Body(), &tag)
+	if err != nil {
+		return Tag{}, errors.Wrap(err, "error during unmarshalling http response")
+	}
+
+	return tag, nil
 }

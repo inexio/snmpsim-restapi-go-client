@@ -147,18 +147,18 @@ ProcessMetrics - SNMP simulator system is composed of many running processes. Th
 	LifeCycle  	*ProcessLifeCycle	`json:"lifecycle"`
 */
 type ProcessMetrics struct {
-	Id 				int				`json:"id"`
-	Path       		string			`json:"path"`
-	Runtime    		int				`json:"runtime"`
-	Cpu        		int        		`json:"cpu"`
-	Memory    		int        		`json:"memory"`
-	Files      		int        		`json:"files"`
-	Exits	   		int				`json:"exits"`
-	Changes	   		int				`json:"changes"`
-	UpdateInterval	int				`json:"update_interval"`
-	LastUpdate 		string			`json:"last_update"`
-	ConsolePages	ConsolePages	`json:"console_pages"`
-	Supervisor		Supervisor 		`json:"supervisor"`
+	Id             int          `json:"id"`
+	Path           string       `json:"path"`
+	Runtime        int          `json:"runtime"`
+	Cpu            int          `json:"cpu"`
+	Memory         int          `json:"memory"`
+	Files          int          `json:"files"`
+	Exits          int          `json:"exits"`
+	Changes        int          `json:"changes"`
+	UpdateInterval int          `json:"update_interval"`
+	LastUpdate     string       `json:"last_update"`
+	ConsolePages   ConsolePages `json:"console_pages"`
+	Supervisor     Supervisor   `json:"supervisor"`
 }
 
 /*
@@ -238,9 +238,9 @@ type Tags []Tag
 Console - contains information regarding the console
 */
 type Console struct {
-	Id			int			`json:"id"`
-	Timestamp   string    	`json:"timestamp"`
-	Text        string    	`json:"text"`
+	Id        int    `json:"id"`
+	Timestamp string `json:"timestamp"`
+	Text      string `json:"text"`
 }
 
 /*
@@ -252,15 +252,14 @@ type Consoles []Console
 ConsolePages - contains information regarding snmpsim consoles
 */
 type ConsolePages struct {
-	Count		int		`json:"count"`
-	LastUpdate	string	`json:"last_update"`
+	Count      int    `json:"count"`
+	LastUpdate string `json:"last_update"`
 }
-
 
 /*
 Supervisor - contains information regarding the supervisor
 */
 type Supervisor struct {
-	Hostname	string		`json:"hostname"`
-	WatchDir	string		`json:"watch_dir"`
+	Hostname string `json:"hostname"`
+	WatchDir string `json:"watch_dir"`
 }
