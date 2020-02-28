@@ -2,7 +2,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/inexio/snmpsim-restapi-go-client)](https://goreportcard.com/report/github.com/inexio/snmpsim-restapi-go-client)
 [![GitHub license](https://img.shields.io/badge/license-BSD-blue.svg)](https://github.com/inexio/check_eve_ng/blob/master/LICENSE)
 [![GitHub code style](https://img.shields.io/badge/code%20style-uber--go-brightgreen)](https://github.com/uber-go/guide/blob/master/style.md)
-[![GoDoc doc](https://img.shields.io/badge/godoc-reference-blue)](godoc.org/github.com/inexio/snmpsim-restapi-go-client)
+[![GoDoc doc](https://img.shields.io/badge/godoc-reference-blue)](https://godoc.org/github.com/inexio/snmpsim-restapi-go-client)
 
 ## Description
 
