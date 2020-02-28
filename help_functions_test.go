@@ -75,6 +75,7 @@ func init() {
 	viperMetrics := viper.New()
 	viperMetrics.SetConfigFile(testDataDir + "metrics-api-test-config.yaml")
 	viperMetrics.SetEnvPrefix("snmpsim_metrics_api_test")
+	viperMetrics.SetEnvKeyReplacer(replacer)
 	viperMetrics.AutomaticEnv()
 
 	err = viperMetrics.ReadInConfig()
