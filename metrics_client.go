@@ -246,7 +246,6 @@ func (c *MetricsClient) GetMessageFilters() (MessageFilters, error) {
 		return nil, errors.Wrap(err, "error during unmarshalling http response")
 	}
 
-
 	var messageFilters MessageFilters
 
 	for key := range filters {

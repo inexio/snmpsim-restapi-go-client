@@ -266,7 +266,7 @@ type Supervisor struct {
 
 /*
 MessageFilters resembles the response structure of GetMessageFilters
- */
+*/
 type MessageFilters filters
 
 /*
@@ -276,5 +276,5 @@ type PacketFilters filters
 
 /*
 filters resembles the base structure of a Get...Filters response
- */
+*/
 type filters []string
