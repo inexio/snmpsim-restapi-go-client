@@ -263,3 +263,18 @@ type Supervisor struct {
 	Hostname string `json:"hostname"`
 	WatchDir string `json:"watch_dir"`
 }
+
+/*
+MessageFilters resembles the response structure of GetMessageFilters
+ */
+type MessageFilters filters
+
+/*
+PacketFilters resembles the response structure of GetPacketFilters
+*/
+type PacketFilters filters
+
+/*
+filters resembles the base structure of a Get...Filters response
+ */
+type filters []string

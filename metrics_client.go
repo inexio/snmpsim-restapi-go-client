@@ -166,7 +166,7 @@ func (c *MetricsClient) GetPackets(filters map[string]string) (PacketMetrics, er
 /*
 GetPacketFilters returns all packet filters.
 */
-func (c *MetricsClient) GetPacketFilters() (map[string]interface{}, error) {
+func (c *MetricsClient) GetPacketFilters() (PacketFilters, error) {
 	response, err := c.request("GET", metricsEndpointPath+"activity/packets/filters", "", nil, nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "error during request")
@@ -175,11 +175,17 @@ func (c *MetricsClient) GetPacketFilters() (map[string]interface{}, error) {
 		return nil, getHttpError(response)
 	}
 
-	var packetFilters map[string]interface{}
-	err = json.Unmarshal(response.Body(), &packetFilters)
+	var filters map[string]interface{}
+	err = json.Unmarshal(response.Body(), &filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "error during unmarshalling http response")
 	}
+
+	var packetFilters PacketFilters
+	for key := range filters {
+		packetFilters = append(packetFilters, key)
+	}
+
 	return packetFilters, nil
 }
 
@@ -225,7 +231,7 @@ func (c *MetricsClient) GetMessages(filters map[string]string) (MessageMetrics, 
 /*
 GetMessageFilters returns all message filters.
 */
-func (c *MetricsClient) GetMessageFilters() (map[string]interface{}, error) {
+func (c *MetricsClient) GetMessageFilters() (MessageFilters, error) {
 	response, err := c.request("GET", metricsEndpointPath+"activity/messages/filters", "", nil, nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "error during request")
@@ -234,11 +240,19 @@ func (c *MetricsClient) GetMessageFilters() (map[string]interface{}, error) {
 		return nil, getHttpError(response)
 	}
 
-	var messageFilters map[string]interface{}
-	err = json.Unmarshal(response.Body(), &messageFilters)
+	var filters map[string]interface{}
+	err = json.Unmarshal(response.Body(), &filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "error during unmarshalling http response")
 	}
+
+
+	var messageFilters MessageFilters
+
+	for key := range filters {
+		messageFilters = append(messageFilters, key)
+	}
+
 	return messageFilters, nil
 }
 
