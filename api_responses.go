@@ -11,8 +11,8 @@ Lab - Group of SNMP agents belonging to the same virtual laboratory. Some operat
 type Lab struct {
 	Id     int    `json:"id"`
 	Name   string `json:"name"`
-	Agents Agents `json:"agents"`
 	Power  string `json:"power"`
+	Agents Agents `json:"agents"`
 	Tags   Tags   `json:"tags"`
 }
 
@@ -26,9 +26,8 @@ Engine - Represents a unique, independent and fully operational SNMP engine, tho
 */
 type Engine struct {
 	Id        int       `json:"id"`
-	EngineId  string    `json:"engine_id"`
 	Name      string    `json:"name"`
-	Agents    Agents    `json:"agents"`
+	EngineId  string    `json:"engine_id"`
 	Endpoints Endpoints `json:"endpoints"`
 	Users     Users     `json:"users"`
 	Tags      Tags      `json:"tags"`
@@ -44,12 +43,10 @@ Agent - Represents SNMP agent. Consists of SNMP engine and transport endpoints i
 */
 type Agent struct {
 	Id        int       `json:"id"`
-	Engines   Engines   `json:"engines"`
 	Name      string    `json:"name"`
-	Endpoints Endpoints `json:"endpoints"`
-	Labs      Labs      `json:"labs"`
-	Selectors Selectors `json:"selectors"`
 	DataDir   string    `json:"data_dir"`
+	Engines   Engines   `json:"engines"`
+	Selectors Selectors `json:"selectors"`
 	Tags      Tags      `json:"tags"`
 }
 
@@ -63,7 +60,6 @@ Endpoint - SNMP transport endpoint object. Each SNMP engine can bind one or more
 */
 type Endpoint struct {
 	Id       int     `json:"id"`
-	Engines  Engines `json:"engines"`
 	Name     string  `json:"name"`
 	Protocol string  `json:"protocol"`
 	Address  string  `json:"address"`
@@ -97,7 +93,6 @@ type User struct {
 	Name      string  `json:"name"`
 	AuthKey   string  `json:"auth_key"`
 	AuthProto string  `json:"auth_proto"`
-	Engines   Engines `json:"engines"`
 	PrivKey   string  `json:"priv_key"`
 	PrivProto string  `json:"priv_proto"`
 	User      string  `json:"user"`
