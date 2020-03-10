@@ -59,11 +59,11 @@ type Endpoints []Endpoint
 Endpoint - SNMP transport endpoint object. Each SNMP engine can bind one or more transport endpoints. Each transport endpoint can only be bound by one SNMP engine.
 */
 type Endpoint struct {
-	Id       int     `json:"id"`
-	Name     string  `json:"name"`
-	Protocol string  `json:"protocol"`
-	Address  string  `json:"address"`
-	Tags     Tags    `json:"tags"`
+	Id       int    `json:"id"`
+	Name     string `json:"name"`
+	Protocol string `json:"protocol"`
+	Address  string `json:"address"`
+	Tags     Tags   `json:"tags"`
 }
 
 /*
@@ -89,14 +89,14 @@ type Users []User
 User - SNMPv3 USM user object. Contains SNMPv3 credentials grouped by user name.
 */
 type User struct {
-	Id        int     `json:"id"`
-	Name      string  `json:"name"`
-	AuthKey   string  `json:"auth_key"`
-	AuthProto string  `json:"auth_proto"`
-	PrivKey   string  `json:"priv_key"`
-	PrivProto string  `json:"priv_proto"`
-	User      string  `json:"user"`
-	Tags      Tags    `json:"tags"`
+	Id        int    `json:"id"`
+	Name      string `json:"name"`
+	AuthKey   string `json:"auth_key"`
+	AuthProto string `json:"auth_proto"`
+	PrivKey   string `json:"priv_key"`
+	PrivProto string `json:"priv_proto"`
+	User      string `json:"user"`
+	Tags      Tags   `json:"tags"`
 }
 
 //TODO: not implemented int the api yet, there is only one default selector for snmpv2c and one for snmpv3.
