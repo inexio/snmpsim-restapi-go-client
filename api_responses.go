@@ -67,6 +67,21 @@ type Endpoint struct {
 }
 
 /*
+ProcessEndpoints is an array of process-endpoint
+*/
+type ProcessEndpoints []ProcessEndpoint
+
+/*
+ProcessEndpoint - SNMP transport endpoint object. Each SNMP process can bind one or more transport endpoints. Each transport endpoint can only be bound by one SNMP process.
+*/
+type ProcessEndpoint struct {
+	Id       int            `json:"id"`
+	Protocol string         `json:"protocol"`
+	Address  string         `json:"address"`
+	Process  ProcessMetrics `json:"process"`
+}
+
+/*
 Recordings is an array of recordings.
 */
 type Recordings []Recording
@@ -91,11 +106,11 @@ User - SNMPv3 USM user object. Contains SNMPv3 credentials grouped by user name.
 type User struct {
 	Id        int    `json:"id"`
 	Name      string `json:"name"`
+	User      string `json:"user"`
 	AuthKey   string `json:"auth_key"`
 	AuthProto string `json:"auth_proto"`
 	PrivKey   string `json:"priv_key"`
 	PrivProto string `json:"priv_proto"`
-	User      string `json:"user"`
 	Tags      Tags   `json:"tags"`
 }
 

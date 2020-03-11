@@ -71,7 +71,7 @@ func (c *MetricsClient) GetProcess(id int) (ProcessMetrics, error) {
 /*
 GetProcessEndpoints returns an array of endpoints for the given process-id.
 */
-func (c *MetricsClient) GetProcessEndpoints(id int) (Endpoints, error) {
+func (c *MetricsClient) GetProcessEndpoints(id int) (ProcessEndpoints, error) {
 	response, err := c.request("GET", metricsEndpointPath+"processes/"+strconv.Itoa(id)+"/endpoints", "", nil, nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "error during request")
@@ -79,7 +79,7 @@ func (c *MetricsClient) GetProcessEndpoints(id int) (Endpoints, error) {
 	if response.StatusCode() != 200 {
 		return nil, getHttpError(response)
 	}
-	var endpoints Endpoints
+	var endpoints ProcessEndpoints
 	err = json.Unmarshal(response.Body(), &endpoints)
 	if err != nil {
 		return nil, errors.Wrap(err, "error during unmarshalling http response")
@@ -90,18 +90,18 @@ func (c *MetricsClient) GetProcessEndpoints(id int) (Endpoints, error) {
 /*
 GetProcessEndpoint returns the endpoint for the given process- and endpoint-id.
 */
-func (c *MetricsClient) GetProcessEndpoint(processId int, endpointId int) (Endpoint, error) {
+func (c *MetricsClient) GetProcessEndpoint(processId int, endpointId int) (ProcessEndpoint, error) {
 	response, err := c.request("GET", metricsEndpointPath+"processes/"+strconv.Itoa(processId)+"/endpoints/"+strconv.Itoa(endpointId), "", nil, nil)
 	if err != nil {
-		return Endpoint{}, errors.Wrap(err, "error during request")
+		return ProcessEndpoint{}, errors.Wrap(err, "error during request")
 	}
 	if response.StatusCode() != 200 {
-		return Endpoint{}, getHttpError(response)
+		return ProcessEndpoint{}, getHttpError(response)
 	}
-	var endpoint Endpoint
+	var endpoint ProcessEndpoint
 	err = json.Unmarshal(response.Body(), &endpoint)
 	if err != nil {
-		return Endpoint{}, errors.Wrap(err, "error during unmarshalling http response")
+		return ProcessEndpoint{}, errors.Wrap(err, "error during unmarshalling http response")
 	}
 	return endpoint, nil
 }
