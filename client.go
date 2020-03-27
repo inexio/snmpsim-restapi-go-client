@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
+	"time"
 )
 
 const (
@@ -60,6 +61,13 @@ func (c *client) SetUsernameAndPassword(username, password string) error {
 	c.password = password
 	c.useAuth = true
 	return nil
+}
+
+/*
+SetTimeout can be used to set a timeout for requests raised from client.
+*/
+func (c *client) SetTimeout(timeout time.Duration) {
+	c.resty.SetTimeout(timeout)
 }
 
 func (c *client) request(method string, path string, body string, header, queryParams map[string]string) (*resty.Response, error) {
