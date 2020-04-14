@@ -18,33 +18,33 @@ type agentData struct {
 }
 
 type httpConfig struct {
-	BaseUrl      string `mapstructure:"baseUrl"`
+	BaseURL      string `mapstructure:"baseUrl"`
 	AuthUsername string `mapstructure:"authUsername"`
 	AuthPassword string `mapstructure:"authPassword"`
 }
 
-type configMetricsApiTest struct {
-	Http        httpConfig `mapstructure:"http"`
+type configMetricsAPITest struct {
+	HTTP        httpConfig `mapstructure:"http"`
 	Protocol    string     `mapstructure:"protocol"`
 	Agent1      agentData  `mapstructure:"agent1"`
 	RootDataDir string     `mapstructure:"rootDataDir"`
 	TestDataDir string
 }
 
-var configMetricsTest configMetricsApiTest
+var configMetricsTest configMetricsAPITest
 
-type configManagementApiTest struct {
-	Http        httpConfig `mapstructure:"http"`
+type configManagementAPITest struct {
+	HTTP        httpConfig `mapstructure:"http"`
 	Protocol    string     `mapstructure:"protocol"`
 	Agent1      agentData  `mapstructure:"agent1"`
 	Agent2      agentData  `mapstructure:"agent2"`
 	RootDataDir string     `mapstructure:"rootDataDir"`
 	TestDataDir string
-	TestTagId   int
+	TestTagID   int
 	TestTagName string `mapstructure:"testTag"`
 }
 
-var configManagementTest configManagementApiTest
+var configManagementTest configManagementAPITest
 
 func init() {
 	_, currFilename, _, _ := runtime.Caller(0)
@@ -94,14 +94,14 @@ func init() {
 
 	//tags
 	//Create a new api client
-	client, err := NewManagementClient(configManagementTest.Http.BaseUrl)
+	client, err := NewManagementClient(configManagementTest.HTTP.BaseURL)
 	if err != nil {
 		fmt.Println("Failed to create a new Management Client during init()!", err)
 		os.Exit(2)
 	}
-	//Set configManagementTest.Http.AuthUsername and password
-	if configManagementTest.Http.AuthUsername != "" && configManagementTest.Http.AuthPassword != "" {
-		err = client.SetUsernameAndPassword(configManagementTest.Http.AuthUsername, configManagementTest.Http.AuthPassword)
+	//Set configManagementTest.HTTP.AuthUsername and password
+	if configManagementTest.HTTP.AuthUsername != "" && configManagementTest.HTTP.AuthPassword != "" {
+		err = client.SetUsernameAndPassword(configManagementTest.HTTP.AuthUsername, configManagementTest.HTTP.AuthPassword)
 		if err != nil {
 			fmt.Println("Failed to set http auth username and password during init()!", err)
 			os.Exit(2)
@@ -119,12 +119,12 @@ func init() {
 	switch tagsCount := len(tags); tagsCount {
 	case 1:
 		//this is the usual case
-		configManagementTest.TestTagId = tags[0].Id
+		configManagementTest.TestTagID = tags[0].ID
 
 		//delete objects with this text
-		_, err = client.DeleteAllObjectsWithTag(configManagementTest.TestTagId)
+		_, err = client.DeleteAllObjectsWithTag(configManagementTest.TestTagID)
 		if err != nil {
-			fmt.Println("Error while trying to delete all objects tagged with tag-id", configManagementTest.TestTagId)
+			fmt.Println("Error while trying to delete all objects tagged with tag-id", configManagementTest.TestTagID)
 			os.Exit(2)
 		}
 	case 0:
@@ -136,7 +136,7 @@ func init() {
 			os.Exit(2)
 		}
 		fmt.Println("Successfully created new tag for management api test!")
-		configManagementTest.TestTagId = tag.Id
+		configManagementTest.TestTagID = tag.ID
 	default:
 		//more than one tag found, something is wrong
 		fmt.Println("There was more than one tag found for the management api test!")
@@ -153,7 +153,7 @@ AGENTS
 */
 
 func createAgentAndCheckForSuccess(t *testing.T, client *ManagementClient, name, dataDir string) (Agent, error) {
-	agent, err := client.CreateAgentWithTag(name, dataDir, configManagementTest.TestTagId)
+	agent, err := client.CreateAgentWithTag(name, dataDir, configManagementTest.TestTagID)
 	if !assert.NoError(t, err, "error while creating a new agent") {
 		return Agent{}, err
 	}
@@ -171,7 +171,7 @@ func createAgentAndCheckForSuccess(t *testing.T, client *ManagementClient, name,
 }
 
 func deleteAgentAndCheckForSuccess(t *testing.T, client *ManagementClient, agent Agent) error {
-	err := client.DeleteAgent(agent.Id)
+	err := client.DeleteAgent(agent.ID)
 	assert.NoError(t, err, "error while deleting lab")
 
 	agents, err := client.GetAgents(nil)
@@ -185,13 +185,13 @@ func deleteAgentAndCheckForSuccess(t *testing.T, client *ManagementClient, agent
 }
 
 func addEngineToAgentAndCheckForSuccess(t *testing.T, client *ManagementClient, agent Agent, engine Engine) error {
-	err := client.AddEngineToAgent(agent.Id, engine.Id)
+	err := client.AddEngineToAgent(agent.ID, engine.ID)
 	if !assert.NoError(t, err, "error while adding engine to agent") {
 		return err
 	}
 
 	//Test if engine was added to the agent
-	agent, err = client.GetAgent(agent.Id)
+	agent, err = client.GetAgent(agent.ID)
 	if !assert.NoError(t, err, "error while get agent") {
 		return err
 	}
@@ -203,11 +203,11 @@ func addEngineToAgentAndCheckForSuccess(t *testing.T, client *ManagementClient, 
 
 func removeEngineFromAgentAndCheckForSuccess(t *testing.T, client *ManagementClient, agent Agent, engine Engine) error {
 	//Remove engine from agent
-	err := client.RemoveEngineFromAgent(agent.Id, engine.Id)
+	err := client.RemoveEngineFromAgent(agent.ID, engine.ID)
 	if !assert.NoError(t, err, "error while deleting engine") {
 		return err
 	}
-	agent, err = client.GetAgent(agent.Id)
+	agent, err = client.GetAgent(agent.ID)
 	if !assert.NoError(t, err, "error while get agent") {
 		return err
 	}
@@ -218,13 +218,13 @@ func removeEngineFromAgentAndCheckForSuccess(t *testing.T, client *ManagementCli
 }
 
 func addTagToAgentAndCheckForSuccess(t *testing.T, client *ManagementClient, agent Agent, tag Tag) error {
-	err := client.AddTagToAgent(agent.Id, tag.Id)
+	err := client.AddTagToAgent(agent.ID, tag.ID)
 	if !assert.NoError(t, err, "error while adding tag to agent") {
 		return err
 	}
 
 	//Test if tag was added to the agent
-	agent, err = client.GetAgent(agent.Id)
+	agent, err = client.GetAgent(agent.ID)
 	if !assert.NoError(t, err, "error while get agent") {
 		return err
 	}
@@ -235,11 +235,11 @@ func addTagToAgentAndCheckForSuccess(t *testing.T, client *ManagementClient, age
 }
 
 func removeTagFromAgentAndCheckForSuccess(t *testing.T, client *ManagementClient, agent Agent, tag Tag) error {
-	err := client.RemoveTagFromAgent(agent.Id, tag.Id)
+	err := client.RemoveTagFromAgent(agent.ID, tag.ID)
 	if !assert.NoError(t, err, "error while removing tag from agent") {
 		return err
 	}
-	agent, err = client.GetAgent(agent.Id)
+	agent, err = client.GetAgent(agent.ID)
 	if !assert.NoError(t, err, "error while get agent") {
 		return err
 	}
@@ -254,7 +254,7 @@ LABS
 */
 
 func createLabAndCheckForSuccess(t *testing.T, client *ManagementClient, name string) (Lab, error) {
-	lab, err := client.CreateLabWithTag(name, configManagementTest.TestTagId)
+	lab, err := client.CreateLabWithTag(name, configManagementTest.TestTagID)
 	if !assert.NoError(t, err, "error while creating a new lab") {
 		return Lab{}, err
 	}
@@ -271,7 +271,7 @@ func createLabAndCheckForSuccess(t *testing.T, client *ManagementClient, name st
 }
 
 func deleteLabAndCheckForSuccess(t *testing.T, client *ManagementClient, lab Lab) error {
-	err := client.DeleteLab(lab.Id)
+	err := client.DeleteLab(lab.ID)
 	assert.NoError(t, err, "error while deleting lab")
 
 	//Test if lab was deleted
@@ -286,13 +286,13 @@ func deleteLabAndCheckForSuccess(t *testing.T, client *ManagementClient, lab Lab
 }
 
 func addAgentToLabAndCheckForSuccess(t *testing.T, client *ManagementClient, lab Lab, agent Agent) error {
-	err := client.AddAgentToLab(lab.Id, agent.Id)
+	err := client.AddAgentToLab(lab.ID, agent.ID)
 	if !assert.NoError(t, err, "error while adding agent to lab") {
 		return err
 	}
 
 	//Test if agent was added to the lab
-	lab, err = client.GetLab(lab.Id)
+	lab, err = client.GetLab(lab.ID)
 	if !assert.NoError(t, err, "error while get lab") {
 		return err
 	}
@@ -304,11 +304,11 @@ func addAgentToLabAndCheckForSuccess(t *testing.T, client *ManagementClient, lab
 
 func removeAgentFromLabAndCheckForSuccess(t *testing.T, client *ManagementClient, lab Lab, agent Agent) error {
 	//Remove agent from lab
-	err := client.RemoveAgentFromLab(lab.Id, agent.Id)
+	err := client.RemoveAgentFromLab(lab.ID, agent.ID)
 	if !assert.NoError(t, err, "error while deleting agent") {
 		return err
 	}
-	lab, err = client.GetLab(lab.Id)
+	lab, err = client.GetLab(lab.ID)
 	if !assert.NoError(t, err, "error while get lab") {
 		return err
 	}
@@ -323,11 +323,11 @@ func setLabPowerAndCheckForSuccess(t *testing.T, client *ManagementClient, lab L
 	if powerBool == false {
 		power = "off"
 	}
-	err := client.SetLabPower(lab.Id, powerBool)
+	err := client.SetLabPower(lab.ID, powerBool)
 	if !assert.NoError(t, err, "error while turning power on for lab") {
 		return err
 	}
-	lab, err = client.GetLab(lab.Id)
+	lab, err = client.GetLab(lab.ID)
 	if !assert.NoError(t, err, "error while get lab") {
 		return err
 	}
@@ -338,13 +338,13 @@ func setLabPowerAndCheckForSuccess(t *testing.T, client *ManagementClient, lab L
 }
 
 func addTagToLabAndCheckForSuccess(t *testing.T, client *ManagementClient, lab Lab, tag Tag) error {
-	err := client.AddTagToLab(lab.Id, tag.Id)
+	err := client.AddTagToLab(lab.ID, tag.ID)
 	if !assert.NoError(t, err, "error while adding tag to lab") {
 		return err
 	}
 
 	//Test if tag was added to the lab
-	lab, err = client.GetLab(lab.Id)
+	lab, err = client.GetLab(lab.ID)
 	if !assert.NoError(t, err, "error while get lab") {
 		return err
 	}
@@ -355,11 +355,11 @@ func addTagToLabAndCheckForSuccess(t *testing.T, client *ManagementClient, lab L
 }
 
 func removeTagFromLabAndCheckForSuccess(t *testing.T, client *ManagementClient, lab Lab, tag Tag) error {
-	err := client.RemoveTagFromLab(lab.Id, tag.Id)
+	err := client.RemoveTagFromLab(lab.ID, tag.ID)
 	if !assert.NoError(t, err, "error while removing tag from lab") {
 		return err
 	}
-	lab, err = client.GetLab(lab.Id)
+	lab, err = client.GetLab(lab.ID)
 	if !assert.NoError(t, err, "error while get lab") {
 		return err
 	}
@@ -372,9 +372,9 @@ func removeTagFromLabAndCheckForSuccess(t *testing.T, client *ManagementClient, 
 /*
 ENGINES
 */
-func createEngineAndCheckForSuccess(t *testing.T, client *ManagementClient, name, engineId string) (Engine, error) {
+func createEngineAndCheckForSuccess(t *testing.T, client *ManagementClient, name, engineID string) (Engine, error) {
 	//Create an engine
-	engine, err := client.CreateEngineWithTag(name, engineId, configManagementTest.TestTagId)
+	engine, err := client.CreateEngineWithTag(name, engineID, configManagementTest.TestTagID)
 	if !assert.NoError(t, err, "error while creating a new api engine") {
 		return Engine{}, err
 	}
@@ -391,7 +391,7 @@ func createEngineAndCheckForSuccess(t *testing.T, client *ManagementClient, name
 }
 
 func deleteEngineAndCheckForSuccess(t *testing.T, client *ManagementClient, engine Engine) error {
-	err := client.DeleteEngine(engine.Id)
+	err := client.DeleteEngine(engine.ID)
 	assert.NoError(t, err, "error while deleting engine")
 
 	//Test if engine was deleted
@@ -406,13 +406,13 @@ func deleteEngineAndCheckForSuccess(t *testing.T, client *ManagementClient, engi
 }
 
 func addUserToEngineAndCheckForSuccess(t *testing.T, client *ManagementClient, engine Engine, user User) error {
-	err := client.AddUserToEngine(engine.Id, user.Id)
+	err := client.AddUserToEngine(engine.ID, user.ID)
 	if !assert.NoError(t, err, "error while adding user to engine") {
 		return err
 	}
 
 	//Test if user was added to the engine
-	engine, err = client.GetEngine(engine.Id)
+	engine, err = client.GetEngine(engine.ID)
 	if !assert.NoError(t, err, "error while get engine") {
 		return err
 	}
@@ -424,11 +424,11 @@ func addUserToEngineAndCheckForSuccess(t *testing.T, client *ManagementClient, e
 
 func removeUserFromEngineAndCheckForSuccess(t *testing.T, client *ManagementClient, engine Engine, user User) error {
 	//Remove user from engine
-	err := client.RemoveUserFromEngine(engine.Id, user.Id)
+	err := client.RemoveUserFromEngine(engine.ID, user.ID)
 	if !assert.NoError(t, err, "error while deleting user") {
 		return err
 	}
-	engine, err = client.GetEngine(engine.Id)
+	engine, err = client.GetEngine(engine.ID)
 	if !assert.NoError(t, err, "error while get engine") {
 		return err
 	}
@@ -439,13 +439,13 @@ func removeUserFromEngineAndCheckForSuccess(t *testing.T, client *ManagementClie
 }
 
 func addEndpointToEngineAndCheckForSuccess(t *testing.T, client *ManagementClient, engine Engine, endpoint Endpoint) error {
-	err := client.AddEndpointToEngine(engine.Id, endpoint.Id)
+	err := client.AddEndpointToEngine(engine.ID, endpoint.ID)
 	if !assert.NoError(t, err, "error while adding endpoint to engine") {
 		return err
 	}
 
 	//Test if endpoint was added to the engine
-	engine, err = client.GetEngine(engine.Id)
+	engine, err = client.GetEngine(engine.ID)
 	if !assert.NoError(t, err, "error while get engine") {
 		return err
 	}
@@ -457,11 +457,11 @@ func addEndpointToEngineAndCheckForSuccess(t *testing.T, client *ManagementClien
 
 func removeEndpointFromEngineAndCheckForSuccess(t *testing.T, client *ManagementClient, engine Engine, endpoint Endpoint) error {
 	//Remove endpoint from engine
-	err := client.RemoveEndpointFromEngine(engine.Id, endpoint.Id)
+	err := client.RemoveEndpointFromEngine(engine.ID, endpoint.ID)
 	if !assert.NoError(t, err, "error while deleting endpoint") {
 		return err
 	}
-	engine, err = client.GetEngine(engine.Id)
+	engine, err = client.GetEngine(engine.ID)
 	if !assert.NoError(t, err, "error while get engine") {
 		return err
 	}
@@ -472,13 +472,13 @@ func removeEndpointFromEngineAndCheckForSuccess(t *testing.T, client *Management
 }
 
 func addTagToEngineAndCheckForSuccess(t *testing.T, client *ManagementClient, engine Engine, tag Tag) error {
-	err := client.AddTagToEngine(engine.Id, tag.Id)
+	err := client.AddTagToEngine(engine.ID, tag.ID)
 	if !assert.NoError(t, err, "error while adding tag to engine") {
 		return err
 	}
 
 	//Test if tag was added to the engine
-	engine, err = client.GetEngine(engine.Id)
+	engine, err = client.GetEngine(engine.ID)
 	if !assert.NoError(t, err, "error while get engine") {
 		return err
 	}
@@ -489,11 +489,11 @@ func addTagToEngineAndCheckForSuccess(t *testing.T, client *ManagementClient, en
 }
 
 func removeTagFromEngineAndCheckForSuccess(t *testing.T, client *ManagementClient, engine Engine, tag Tag) error {
-	err := client.RemoveTagFromEngine(engine.Id, tag.Id)
+	err := client.RemoveTagFromEngine(engine.ID, tag.ID)
 	if !assert.NoError(t, err, "error while removing tag from engine") {
 		return err
 	}
-	engine, err = client.GetEngine(engine.Id)
+	engine, err = client.GetEngine(engine.ID)
 	if !assert.NoError(t, err, "error while get engine") {
 		return err
 	}
@@ -508,7 +508,7 @@ ENDPOINTS
 */
 
 func createEndpointAndCheckForSuccess(t *testing.T, client *ManagementClient, name, address, domain string) (Endpoint, error) {
-	endpoint, err := client.CreateEndpointWithTag(name, address, domain, configManagementTest.TestTagId)
+	endpoint, err := client.CreateEndpointWithTag(name, address, domain, configManagementTest.TestTagID)
 	if !assert.NoError(t, err, "error while creating a new endpoint") {
 		return Endpoint{}, err
 	}
@@ -526,7 +526,7 @@ func createEndpointAndCheckForSuccess(t *testing.T, client *ManagementClient, na
 }
 
 func deleteEndpointAndCheckForSuccess(t *testing.T, client *ManagementClient, endpoint Endpoint) error {
-	err := client.DeleteEndpoint(endpoint.Id)
+	err := client.DeleteEndpoint(endpoint.ID)
 	assert.NoError(t, err, "error while deleting endpoint")
 
 	//Test if endpoint was deleted
@@ -541,12 +541,12 @@ func deleteEndpointAndCheckForSuccess(t *testing.T, client *ManagementClient, en
 }
 
 func addTagToEndpointAndCheckForSuccess(t *testing.T, client *ManagementClient, endpoint Endpoint, tag Tag) error {
-	err := client.AddTagToEndpoint(endpoint.Id, tag.Id)
+	err := client.AddTagToEndpoint(endpoint.ID, tag.ID)
 	if !assert.NoError(t, err, "error while adding tag to endpoint") {
 		return err
 	}
 	//Test if tag was added to the endpoint
-	endpoint, err = client.GetEndpoint(endpoint.Id)
+	endpoint, err = client.GetEndpoint(endpoint.ID)
 	if !assert.NoError(t, err, "error while get endpoint") {
 		return err
 	}
@@ -557,11 +557,11 @@ func addTagToEndpointAndCheckForSuccess(t *testing.T, client *ManagementClient, 
 }
 
 func removeTagFromEndpointAndCheckForSuccess(t *testing.T, client *ManagementClient, endpoint Endpoint, tag Tag) error {
-	err := client.RemoveTagFromEndpoint(endpoint.Id, tag.Id)
+	err := client.RemoveTagFromEndpoint(endpoint.ID, tag.ID)
 	if !assert.NoError(t, err, "error while removing tag from endpoint") {
 		return err
 	}
-	endpoint, err = client.GetEndpoint(endpoint.Id)
+	endpoint, err = client.GetEndpoint(endpoint.ID)
 	if !assert.NoError(t, err, "error while get endpoint") {
 		return err
 	}
@@ -576,7 +576,7 @@ USERS
 */
 
 func createUserAndCheckForSuccess(t *testing.T, client *ManagementClient, userIdentifier, name, authKey, authProto, privKey, privProto string) (User, error) {
-	user, err := client.CreateUserWithTag(userIdentifier, name, authKey, authProto, privKey, privProto, configManagementTest.TestTagId)
+	user, err := client.CreateUserWithTag(userIdentifier, name, authKey, authProto, privKey, privProto, configManagementTest.TestTagID)
 	if !assert.NoError(t, err, "error while creating a new user") {
 		return User{}, err
 	}
@@ -594,7 +594,7 @@ func createUserAndCheckForSuccess(t *testing.T, client *ManagementClient, userId
 }
 
 func deleteUserAndCheckForSuccess(t *testing.T, client *ManagementClient, user User) error {
-	err := client.DeleteUser(user.Id)
+	err := client.DeleteUser(user.ID)
 	assert.NoError(t, err, "error while deleting user")
 
 	//Test if user was deleted
@@ -609,13 +609,13 @@ func deleteUserAndCheckForSuccess(t *testing.T, client *ManagementClient, user U
 }
 
 func addTagToUserAndCheckForSuccess(t *testing.T, client *ManagementClient, user User, tag Tag) error {
-	err := client.AddTagToUser(user.Id, tag.Id)
+	err := client.AddTagToUser(user.ID, tag.ID)
 	if !assert.NoError(t, err, "error while adding tag to user") {
 		return err
 	}
 
 	//Test if tag was added to the user
-	user, err = client.GetUser(user.Id)
+	user, err = client.GetUser(user.ID)
 	if !assert.NoError(t, err, "error while get user") {
 		return err
 	}
@@ -626,11 +626,11 @@ func addTagToUserAndCheckForSuccess(t *testing.T, client *ManagementClient, user
 }
 
 func removeTagFromUserAndCheckForSuccess(t *testing.T, client *ManagementClient, user User, tag Tag) error {
-	err := client.RemoveTagFromUser(user.Id, tag.Id)
+	err := client.RemoveTagFromUser(user.ID, tag.ID)
 	if !assert.NoError(t, err, "error while removing tag from user") {
 		return err
 	}
-	user, err = client.GetUser(user.Id)
+	user, err = client.GetUser(user.ID)
 	if !assert.NoError(t, err, "error while get user") {
 		return err
 	}
@@ -698,7 +698,7 @@ func createTagAndCheckForSuccess(t *testing.T, client *ManagementClient, name, d
 }
 
 func deleteTagAndCheckForSuccess(t *testing.T, client *ManagementClient, tag Tag) error {
-	err := client.DeleteTag(tag.Id)
+	err := client.DeleteTag(tag.ID)
 	assert.NoError(t, err, "error while deleting tag")
 
 	//Test if tag was deleted
@@ -718,7 +718,7 @@ HELP FUNCTIONS
 func isUserInEngine(engine Engine, user User) bool {
 	isUserInEngine := false
 	for _, currUser := range engine.Users {
-		if currUser.Id == user.Id {
+		if currUser.ID == user.ID {
 			isUserInEngine = true
 			break
 		}
@@ -729,7 +729,7 @@ func isUserInEngine(engine Engine, user User) bool {
 func isEndpointInEngine(engine Engine, endpoint Endpoint) bool {
 	isEndpointInEngine := false
 	for _, currEndpoint := range engine.Endpoints {
-		if currEndpoint.Id == endpoint.Id {
+		if currEndpoint.ID == endpoint.ID {
 			isEndpointInEngine = true
 			break
 		}
@@ -740,7 +740,7 @@ func isEndpointInEngine(engine Engine, endpoint Endpoint) bool {
 func isEngineInAgent(agent Agent, engine Engine) bool {
 	isEngineInAgent := false
 	for _, currEngine := range agent.Engines {
-		if currEngine.Id == engine.Id {
+		if currEngine.ID == engine.ID {
 			isEngineInAgent = true
 			break
 		}
@@ -751,7 +751,7 @@ func isEngineInAgent(agent Agent, engine Engine) bool {
 func isAgentInLab(lab Lab, agent Agent) bool {
 	isAgentInLab := false
 	for _, currAgent := range lab.Agents {
-		if currAgent.Id == agent.Id {
+		if currAgent.ID == agent.ID {
 			isAgentInLab = true
 			break
 		}
@@ -762,7 +762,7 @@ func isAgentInLab(lab Lab, agent Agent) bool {
 func agentExists(agent Agent, agents Agents) bool {
 	agentWasCreated := false
 	for _, currAgent := range agents {
-		if currAgent.Id == agent.Id {
+		if currAgent.ID == agent.ID {
 			agentWasCreated = true
 			break
 		}
@@ -773,7 +773,7 @@ func agentExists(agent Agent, agents Agents) bool {
 func labExists(lab Lab, labs Labs) bool {
 	labWasCreated := false
 	for _, currLab := range labs {
-		if currLab.Id == lab.Id {
+		if currLab.ID == lab.ID {
 			labWasCreated = true
 			break
 		}
@@ -784,7 +784,7 @@ func labExists(lab Lab, labs Labs) bool {
 func engineExists(engine Engine, engines Engines) bool {
 	engineWasCreated := false
 	for _, currEngine := range engines {
-		if currEngine.Id == engine.Id {
+		if currEngine.ID == engine.ID {
 			engineWasCreated = true
 			break
 		}
@@ -795,7 +795,7 @@ func engineExists(engine Engine, engines Engines) bool {
 func endpointExists(endpoint Endpoint, endpoints Endpoints) bool {
 	endpointWasCreated := false
 	for _, currEndpoint := range endpoints {
-		if currEndpoint.Id == endpoint.Id {
+		if currEndpoint.ID == endpoint.ID {
 			endpointWasCreated = true
 			break
 		}
@@ -805,7 +805,7 @@ func endpointExists(endpoint Endpoint, endpoints Endpoints) bool {
 func userExists(user User, users Users) bool {
 	userWasCreated := false
 	for _, currUser := range users {
-		if currUser.Id == user.Id {
+		if currUser.ID == user.ID {
 			userWasCreated = true
 			break
 		}
@@ -815,7 +815,7 @@ func userExists(user User, users Users) bool {
 func tagExists(tag Tag, tags Tags) bool {
 	tagWasCreated := false
 	for _, currTag := range tags {
-		if currTag.Id == tag.Id {
+		if currTag.ID == tag.ID {
 			tagWasCreated = true
 			break
 		}

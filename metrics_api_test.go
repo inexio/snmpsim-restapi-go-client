@@ -32,19 +32,19 @@ func TestMetricsClient_BuildUpSetupAndTestMetrics(t *testing.T) {
 	userIdentifier1 := "test-buildUpSetupAndTestMetrics"
 	//engine
 	engineName1 := "test-buildUpSetupAndTestMetrics-engine1"
-	engineId1 := "0102030405070809"
+	engineID1 := "0102030405070809"
 	//Record File:
 	localRecordFilePath1 := configMetricsTest.TestDataDir + "snmprecs/TestMetricsClient_BuildUpSetupAndTestMetrics/" + community + ".snmprec"
 	remoteRecordFilePath1 := agentDataDir1 + "/" + community + ".snmprec"
 
 	//Create a new api client
-	managementClient, err := NewManagementClient(configManagementTest.Http.BaseUrl)
+	managementClient, err := NewManagementClient(configManagementTest.HTTP.BaseURL)
 	if !assert.NoError(t, err, "error while creating a new api client") {
 		return
 	}
-	//Set configMetricsTest.Http.AuthUsername and password
-	if configManagementTest.Http.AuthUsername != "" && configManagementTest.Http.AuthPassword != "" {
-		err = managementClient.SetUsernameAndPassword(configManagementTest.Http.AuthUsername, configManagementTest.Http.AuthPassword)
+	//Set configMetricsTest.HTTP.AuthUsername and password
+	if configManagementTest.HTTP.AuthUsername != "" && configManagementTest.HTTP.AuthPassword != "" {
+		err = managementClient.SetUsernameAndPassword(configManagementTest.HTTP.AuthUsername, configManagementTest.HTTP.AuthPassword)
 		if !assert.NoError(t, err, "error while creating a new api client") {
 			return
 		}
@@ -54,7 +54,7 @@ func TestMetricsClient_BuildUpSetupAndTestMetrics(t *testing.T) {
 	//TODO: remove this when its possible to overwrite files
 	err = managementClient.DeleteRecordFile(remoteRecordFilePath1)
 	if err != nil {
-		if err, ok := err.(HttpError); assert.True(t, ok, "unknown error returned while deleting record file") {
+		if err, ok := err.(HTTPError); assert.True(t, ok, "unknown error returned while deleting record file") {
 			if !assert.True(t, err.StatusCode == 404, "http error code for deleting record file is not 404! error: "+err.Error()) {
 				return
 			}
@@ -85,7 +85,7 @@ func TestMetricsClient_BuildUpSetupAndTestMetrics(t *testing.T) {
 	}()
 
 	//Create an engine1
-	engine1, err := createEngineAndCheckForSuccess(t, managementClient, engineName1, engineId1)
+	engine1, err := createEngineAndCheckForSuccess(t, managementClient, engineName1, engineID1)
 	if err != nil {
 		return
 	}
@@ -246,13 +246,13 @@ func TestMetricsClient_BuildUpSetupAndTestMetrics(t *testing.T) {
 	//TODO test metric failures
 
 	//Create a new api client
-	metricsClient, err := NewMetricsClient(configMetricsTest.Http.BaseUrl)
+	metricsClient, err := NewMetricsClient(configMetricsTest.HTTP.BaseURL)
 	if !assert.NoError(t, err, "error while creating a new api client") {
 		return
 	}
-	//Set configMetricsTest.Http.AuthUsername and password
-	if configMetricsTest.Http.AuthUsername != "" && configMetricsTest.Http.AuthPassword != "" {
-		err = metricsClient.SetUsernameAndPassword(configMetricsTest.Http.AuthUsername, configMetricsTest.Http.AuthPassword)
+	//Set configMetricsTest.HTTP.AuthUsername and password
+	if configMetricsTest.HTTP.AuthUsername != "" && configMetricsTest.HTTP.AuthPassword != "" {
+		err = metricsClient.SetUsernameAndPassword(configMetricsTest.HTTP.AuthUsername, configMetricsTest.HTTP.AuthPassword)
 		if !assert.NoError(t, err, "error while creating a new api client") {
 			return
 		}
@@ -352,19 +352,19 @@ func TestMetricsClient_Processes(t *testing.T) {
 	userIdentifier1 := "test-buildUpSetupAndTestMetrics"
 	//engine
 	engineName1 := "test-buildUpSetupAndTestMetrics-engine1"
-	engineId1 := "0102030405070809"
+	engineID1 := "0102030405070809"
 	//Record File:
 	localRecordFilePath1 := configMetricsTest.TestDataDir + "snmprecs/TestMetricsClient_BuildUpSetupAndTestMetrics/" + community + ".snmprec"
 	remoteRecordFilePath1 := agentDataDir1 + "/" + community + ".snmprec"
 
 	//Create a new api client
-	managementClient, err := NewManagementClient(configManagementTest.Http.BaseUrl)
+	managementClient, err := NewManagementClient(configManagementTest.HTTP.BaseURL)
 	if !assert.NoError(t, err, "error while creating a new api client") {
 		return
 	}
-	//Set configMetricsTest.Http.AuthUsername and password
-	if configManagementTest.Http.AuthUsername != "" && configManagementTest.Http.AuthPassword != "" {
-		err = managementClient.SetUsernameAndPassword(configManagementTest.Http.AuthUsername, configManagementTest.Http.AuthPassword)
+	//Set configMetricsTest.HTTP.AuthUsername and password
+	if configManagementTest.HTTP.AuthUsername != "" && configManagementTest.HTTP.AuthPassword != "" {
+		err = managementClient.SetUsernameAndPassword(configManagementTest.HTTP.AuthUsername, configManagementTest.HTTP.AuthPassword)
 		if !assert.NoError(t, err, "error while creating a new api client") {
 			return
 		}
@@ -374,7 +374,7 @@ func TestMetricsClient_Processes(t *testing.T) {
 	//TODO: remove this when its possible to overwrite files
 	err = managementClient.DeleteRecordFile(remoteRecordFilePath1)
 	if err != nil {
-		if err, ok := err.(HttpError); assert.True(t, ok, "unknown error returned while deleting record file") {
+		if err, ok := err.(HTTPError); assert.True(t, ok, "unknown error returned while deleting record file") {
 			if !assert.True(t, err.StatusCode == 404, "http error code for deleting record file is not 404! error: "+err.Error()) {
 				return
 			}
@@ -384,13 +384,13 @@ func TestMetricsClient_Processes(t *testing.T) {
 	}
 
 	//Create a new api client
-	metricsClient, err := NewMetricsClient(configMetricsTest.Http.BaseUrl)
+	metricsClient, err := NewMetricsClient(configMetricsTest.HTTP.BaseURL)
 	if !assert.NoError(t, err, "error while creating a new api client") {
 		return
 	}
-	//Set configMetricsTest.Http.AuthUsername and password
-	if configMetricsTest.Http.AuthUsername != "" && configMetricsTest.Http.AuthPassword != "" {
-		err = metricsClient.SetUsernameAndPassword(configMetricsTest.Http.AuthUsername, configMetricsTest.Http.AuthPassword)
+	//Set configMetricsTest.HTTP.AuthUsername and password
+	if configMetricsTest.HTTP.AuthUsername != "" && configMetricsTest.HTTP.AuthPassword != "" {
+		err = metricsClient.SetUsernameAndPassword(configMetricsTest.HTTP.AuthUsername, configMetricsTest.HTTP.AuthPassword)
 		if !assert.NoError(t, err, "error while creating a new api client") {
 			return
 		}
@@ -418,7 +418,7 @@ func TestMetricsClient_Processes(t *testing.T) {
 	}()
 
 	//Create an engine1
-	engine1, err := createEngineAndCheckForSuccess(t, managementClient, engineName1, engineId1)
+	engine1, err := createEngineAndCheckForSuccess(t, managementClient, engineName1, engineID1)
 	if err != nil {
 		return
 	}
@@ -545,12 +545,12 @@ func TestMetricsClient_Processes(t *testing.T) {
 	}
 
 	//Test GetProcess
-	process, err := metricsClient.GetProcess(processes[0].Id)
+	process, err := metricsClient.GetProcess(processes[0].ID)
 	if assert.NoError(t, err, "error during GetProcess") {
-		assert.NotNil(t, process.Id, "process id is nil")
+		assert.NotNil(t, process.ID, "process id is nil")
 		assert.True(t, process.Path == "/opt/snmpsim/supervised/snmpsim-run-labs.sh", "process path is incorrect")
 		assert.NotNil(t, process.Runtime, "process runtime is nil")
-		assert.NotNil(t, process.Cpu, "process cpu is nil")
+		assert.NotNil(t, process.CPU, "process cpu is nil")
 		assert.NotNil(t, process.Memory, "process memory is nil")
 		assert.NotNil(t, process.Files, "process files is nil")
 		assert.NotNil(t, process.Exits, "process exits is nil")
@@ -564,13 +564,13 @@ func TestMetricsClient_Processes(t *testing.T) {
 	}
 
 	//Test GetProcessEndpoints
-	endpoints, err := metricsClient.GetProcessEndpoints(processes[0].Id)
+	endpoints, err := metricsClient.GetProcessEndpoints(processes[0].ID)
 	if assert.NoError(t, err, "error during GetProcessEndpoints") {
 		assert.True(t, len(endpoints) > 0, "No endpoints found during GetProcessEndpoints")
 	}
 
 	//Test GetProcessEndpoint
-	endpoint, err := metricsClient.GetProcessEndpoint(processes[0].Id, endpoints[0].Id)
+	endpoint, err := metricsClient.GetProcessEndpoint(processes[0].ID, endpoints[0].ID)
 	if assert.NoError(t, err, "error during GetProcessEndpoint") {
 		assert.Equal(t, "udpv4", endpoint.Protocol, "process endpoint protocol does not match with expected")
 		match, _ := regexp.MatchString(`[0-9]{3}\.[0-9]{3}\.[0-9]{3}\.[0-9]{3}:[0-9]+`, endpoint.Address)
@@ -579,13 +579,13 @@ func TestMetricsClient_Processes(t *testing.T) {
 	}
 
 	//Test GetProcessConsolePages
-	consolePages, err := metricsClient.GetProcessConsolePages(processes[0].Id)
+	consolePages, err := metricsClient.GetProcessConsolePages(processes[0].ID)
 	if assert.NoError(t, err, "error during GetProcessConsoles") {
 		assert.True(t, len(consolePages) > 0, "No console pages found during GetProcessConsoles")
 	}
 
 	//Test GetProcessConsolePage
-	consolePage, err := metricsClient.GetProcessConsolePage(processes[0].Id, consolePages[0].Id)
+	consolePage, err := metricsClient.GetProcessConsolePage(processes[0].ID, consolePages[0].ID)
 	if assert.NoError(t, err, "error during GetProcessConsole") {
 		assert.NotEmpty(t, consolePage.Timestamp, "process consol_page timestamp is empty")
 		match, _ := regexp.MatchString(`[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\+[0-9]{2}:[0-9]{2}`, consolePage.Timestamp)

@@ -17,15 +17,15 @@ type MetricsClient struct {
 /*
 NewMetricsClient creates a new NewMetricsClient.
 */
-func NewMetricsClient(baseUrl string) (*MetricsClient, error) {
-	if baseUrl == "" {
+func NewMetricsClient(baseURL string) (*MetricsClient, error) {
+	if baseURL == "" {
 		return nil, errors.New("invalid base url")
 	}
-	//if baseUrl does not end with an "/" it has to be added to the string
-	if lastChar := baseUrl[len(baseUrl)-1:]; lastChar != "/" {
-		baseUrl += "/"
+	//if baseURL does not end with an "/" it has to be added to the string
+	if lastChar := baseURL[len(baseURL)-1:]; lastChar != "/" {
+		baseURL += "/"
 	}
-	clientData := clientData{baseUrl: baseUrl, resty: resty.New(), useAuth: false}
+	clientData := clientData{baseURL: baseURL, resty: resty.New(), useAuth: false}
 	newClient := client{&clientData}
 	return &MetricsClient{newClient}, nil
 }
@@ -39,7 +39,7 @@ func (c *MetricsClient) GetProcesses(filters map[string]string) (ProcessesMetric
 		return nil, errors.Wrap(err, "error during request")
 	}
 	if response.StatusCode() != 200 {
-		return nil, getHttpError(response)
+		return nil, getHTTPError(response)
 	}
 	var processes ProcessesMetrics
 	err = json.Unmarshal(response.Body(), &processes)
@@ -58,7 +58,7 @@ func (c *MetricsClient) GetProcess(id int) (ProcessMetrics, error) {
 		return ProcessMetrics{}, errors.Wrap(err, "error during request")
 	}
 	if response.StatusCode() != 200 {
-		return ProcessMetrics{}, getHttpError(response)
+		return ProcessMetrics{}, getHTTPError(response)
 	}
 	var process ProcessMetrics
 	err = json.Unmarshal(response.Body(), &process)
@@ -77,7 +77,7 @@ func (c *MetricsClient) GetProcessEndpoints(id int) (ProcessEndpoints, error) {
 		return nil, errors.Wrap(err, "error during request")
 	}
 	if response.StatusCode() != 200 {
-		return nil, getHttpError(response)
+		return nil, getHTTPError(response)
 	}
 	var endpoints ProcessEndpoints
 	err = json.Unmarshal(response.Body(), &endpoints)
@@ -90,13 +90,13 @@ func (c *MetricsClient) GetProcessEndpoints(id int) (ProcessEndpoints, error) {
 /*
 GetProcessEndpoint returns the endpoint for the given process- and endpoint-id.
 */
-func (c *MetricsClient) GetProcessEndpoint(processId int, endpointId int) (ProcessEndpoint, error) {
-	response, err := c.request("GET", metricsEndpointPath+"processes/"+strconv.Itoa(processId)+"/endpoints/"+strconv.Itoa(endpointId), "", nil, nil)
+func (c *MetricsClient) GetProcessEndpoint(processID int, endpointID int) (ProcessEndpoint, error) {
+	response, err := c.request("GET", metricsEndpointPath+"processes/"+strconv.Itoa(processID)+"/endpoints/"+strconv.Itoa(endpointID), "", nil, nil)
 	if err != nil {
 		return ProcessEndpoint{}, errors.Wrap(err, "error during request")
 	}
 	if response.StatusCode() != 200 {
-		return ProcessEndpoint{}, getHttpError(response)
+		return ProcessEndpoint{}, getHTTPError(response)
 	}
 	var endpoint ProcessEndpoint
 	err = json.Unmarshal(response.Body(), &endpoint)
@@ -109,13 +109,13 @@ func (c *MetricsClient) GetProcessEndpoint(processId int, endpointId int) (Proce
 /*
 GetProcessConsolePages returns an array of console-pages for the given process-id.
 */
-func (c *MetricsClient) GetProcessConsolePages(processId int) (Consoles, error) {
-	response, err := c.request("GET", metricsEndpointPath+"processes/"+strconv.Itoa(processId)+"/console", "", nil, nil)
+func (c *MetricsClient) GetProcessConsolePages(processID int) (Consoles, error) {
+	response, err := c.request("GET", metricsEndpointPath+"processes/"+strconv.Itoa(processID)+"/console", "", nil, nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "error during request")
 	}
 	if response.StatusCode() != 200 {
-		return nil, getHttpError(response)
+		return nil, getHTTPError(response)
 	}
 	var consolePages Consoles
 	err = json.Unmarshal(response.Body(), &consolePages)
@@ -128,13 +128,13 @@ func (c *MetricsClient) GetProcessConsolePages(processId int) (Consoles, error) 
 /*
 GetProcessConsolePage returns the console-pages for the given process- and console-page-id.
 */
-func (c *MetricsClient) GetProcessConsolePage(processId int, pageId int) (Console, error) {
-	response, err := c.request("GET", metricsEndpointPath+"processes/"+strconv.Itoa(processId)+"/console/"+strconv.Itoa(pageId), "", nil, nil)
+func (c *MetricsClient) GetProcessConsolePage(processID int, pageID int) (Console, error) {
+	response, err := c.request("GET", metricsEndpointPath+"processes/"+strconv.Itoa(processID)+"/console/"+strconv.Itoa(pageID), "", nil, nil)
 	if err != nil {
 		return Console{}, errors.Wrap(err, "error during request")
 	}
 	if response.StatusCode() != 200 {
-		return Console{}, getHttpError(response)
+		return Console{}, getHTTPError(response)
 	}
 	var consolePages Console
 	err = json.Unmarshal(response.Body(), &consolePages)
@@ -153,7 +153,7 @@ func (c *MetricsClient) GetPackets(filters map[string]string) (PacketMetrics, er
 		return PacketMetrics{}, errors.Wrap(err, "error during request")
 	}
 	if response.StatusCode() != 200 {
-		return PacketMetrics{}, getHttpError(response)
+		return PacketMetrics{}, getHTTPError(response)
 	}
 	var packetMetrics PacketMetrics
 	err = json.Unmarshal(response.Body(), &packetMetrics)
@@ -172,7 +172,7 @@ func (c *MetricsClient) GetPacketFilters() (PacketFilters, error) {
 		return nil, errors.Wrap(err, "error during request")
 	}
 	if response.StatusCode() != 200 {
-		return nil, getHttpError(response)
+		return nil, getHTTPError(response)
 	}
 
 	var filters map[string]interface{}
@@ -198,7 +198,7 @@ func (c *MetricsClient) GetPossibleValuesForPacketFilter(filter string) ([]strin
 		return nil, errors.Wrap(err, "error during request")
 	}
 	if response.StatusCode() != 200 {
-		return nil, getHttpError(response)
+		return nil, getHTTPError(response)
 	}
 
 	var messageFilters []string
@@ -218,7 +218,7 @@ func (c *MetricsClient) GetMessages(filters map[string]string) (MessageMetrics, 
 		return MessageMetrics{}, errors.Wrap(err, "error during request")
 	}
 	if response.StatusCode() != 200 {
-		return MessageMetrics{}, getHttpError(response)
+		return MessageMetrics{}, getHTTPError(response)
 	}
 	var messageMetrics MessageMetrics
 	err = json.Unmarshal(response.Body(), &messageMetrics)
@@ -237,7 +237,7 @@ func (c *MetricsClient) GetMessageFilters() (MessageFilters, error) {
 		return nil, errors.Wrap(err, "error during request")
 	}
 	if response.StatusCode() != 200 {
-		return nil, getHttpError(response)
+		return nil, getHTTPError(response)
 	}
 
 	var filters map[string]interface{}
@@ -264,7 +264,7 @@ func (c *MetricsClient) GetPossibleValuesForMessageFilter(filter string) ([]stri
 		return nil, errors.Wrap(err, "error during request")
 	}
 	if response.StatusCode() != 200 {
-		return nil, getHttpError(response)
+		return nil, getHTTPError(response)
 	}
 
 	var messageFilters []string

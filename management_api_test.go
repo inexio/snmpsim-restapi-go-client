@@ -26,7 +26,7 @@ func TestManagementClient_buildUpSetupAndTestIt(t *testing.T) {
 	privProto1 := "des"
 	//engine
 	engineName1 := "test-buildUpSetupAndTestIt-engine1"
-	engineId1 := "0102030405070809"
+	engineID1 := "0102030405070809"
 	//Record File:
 	localRecordFilePath1 := configManagementTest.TestDataDir + "snmprecs/TestManagementClient_buildUpSetupAndTestIt/agent1/" + community + ".snmprec"
 	remoteRecordFilePath1 := agentDataDir1 + "/" + community + ".snmprec"
@@ -43,19 +43,19 @@ func TestManagementClient_buildUpSetupAndTestIt(t *testing.T) {
 	userIdentifier2 := "test-buildUpSetupAndTestIt-user2"
 	//Engine
 	engineName2 := "test-buildUpSetupAndTestIt-engine2"
-	engineId2 := "010203040507080A"
+	engineID2 := "010203040507080A"
 	//Record File
 	localRecordFilePath2 := configManagementTest.TestDataDir + "snmprecs/TestManagementClient_buildUpSetupAndTestIt/agent2/" + community + ".snmprec"
 	remoteRecordFilePath2 := agentDataDir2 + "/" + community + ".snmprec"
 
 	//Create a new api client
-	client, err := NewManagementClient(configManagementTest.Http.BaseUrl)
+	client, err := NewManagementClient(configManagementTest.HTTP.BaseURL)
 	if !assert.NoError(t, err, "error while creating a new api client") {
 		return
 	}
-	//Set configManagementTest.Http.AuthUsername and password
-	if configManagementTest.Http.AuthUsername != "" && configManagementTest.Http.AuthPassword != "" {
-		err = client.SetUsernameAndPassword(configManagementTest.Http.AuthUsername, configManagementTest.Http.AuthPassword)
+	//Set configManagementTest.HTTP.AuthUsername and password
+	if configManagementTest.HTTP.AuthUsername != "" && configManagementTest.HTTP.AuthPassword != "" {
+		err = client.SetUsernameAndPassword(configManagementTest.HTTP.AuthUsername, configManagementTest.HTTP.AuthPassword)
 		if !assert.NoError(t, err, "error while creating a new api client") {
 			return
 		}
@@ -76,7 +76,7 @@ func TestManagementClient_buildUpSetupAndTestIt(t *testing.T) {
 	//TODO: remove this when its possible to overwrite files
 	err = client.DeleteRecordFile(remoteRecordFilePath1)
 	if err != nil {
-		if err, ok := err.(HttpError); assert.True(t, ok, "unknown error returned while deleting record file") {
+		if err, ok := err.(HTTPError); assert.True(t, ok, "unknown error returned while deleting record file") {
 			if !assert.True(t, err.StatusCode == 404, "http error code for deleting record file is not 404! error: "+err.Error()) {
 				return
 			}
@@ -99,7 +99,7 @@ func TestManagementClient_buildUpSetupAndTestIt(t *testing.T) {
 	//TODO: remove this when its possible to overwrite files
 	err = client.DeleteRecordFile(remoteRecordFilePath2)
 	if err != nil {
-		if err, ok := err.(HttpError); assert.True(t, ok, "unknown error returned while deleting record file") {
+		if err, ok := err.(HTTPError); assert.True(t, ok, "unknown error returned while deleting record file") {
 			if !assert.True(t, err.StatusCode == 404, "http error code for deleting record file is not 404! error: "+err.Error()) {
 				return
 			}
@@ -123,7 +123,7 @@ func TestManagementClient_buildUpSetupAndTestIt(t *testing.T) {
 	  --------------------*/
 
 	//Create an engine1
-	engine1, err := createEngineAndCheckForSuccess(t, client, engineName1, engineId1)
+	engine1, err := createEngineAndCheckForSuccess(t, client, engineName1, engineID1)
 	if err != nil {
 		return
 	}
@@ -216,7 +216,7 @@ func TestManagementClient_buildUpSetupAndTestIt(t *testing.T) {
 	  --------------------*/
 
 	//Create an engine2
-	engine2, err := createEngineAndCheckForSuccess(t, client, engineName2, engineId2)
+	engine2, err := createEngineAndCheckForSuccess(t, client, engineName2, engineID2)
 	if err != nil {
 		return
 	}
@@ -426,13 +426,13 @@ func TestManagementClient_UploadRecordFileString_DeleteRecordFile(t *testing.T) 
 	remotePathFile2 := configManagementTest.RootDataDir + "test-UploadRecordFileString_DeleteRecordFile/dir1/public.snmprec"
 
 	//Create a new api client
-	client, err := NewManagementClient(configManagementTest.Http.BaseUrl)
+	client, err := NewManagementClient(configManagementTest.HTTP.BaseURL)
 	if !assert.NoError(t, err, "error while creating a new api client") {
 		return
 	}
-	//Set configManagementTest.Http.AuthUsername and password
-	if configManagementTest.Http.AuthUsername != "" && configManagementTest.Http.AuthPassword != "" {
-		err = client.SetUsernameAndPassword(configManagementTest.Http.AuthUsername, configManagementTest.Http.AuthPassword)
+	//Set configManagementTest.HTTP.AuthUsername and password
+	if configManagementTest.HTTP.AuthUsername != "" && configManagementTest.HTTP.AuthPassword != "" {
+		err = client.SetUsernameAndPassword(configManagementTest.HTTP.AuthUsername, configManagementTest.HTTP.AuthPassword)
 		if !assert.NoError(t, err, "error while creating a new api client") {
 			return
 		}
@@ -441,7 +441,7 @@ func TestManagementClient_UploadRecordFileString_DeleteRecordFile(t *testing.T) 
 	//init cleanup
 	err = client.DeleteRecordFile(remotePathFile1)
 	if err != nil {
-		if err, ok := err.(HttpError); assert.True(t, ok, "error while initial delete is not a http error"+err.Error()) {
+		if err, ok := err.(HTTPError); assert.True(t, ok, "error while initial delete is not a http error"+err.Error()) {
 			if !assert.True(t, err.StatusCode == 404, "cleanup delete error != 404") {
 				return
 			}
@@ -451,7 +451,7 @@ func TestManagementClient_UploadRecordFileString_DeleteRecordFile(t *testing.T) 
 	}
 	err = client.DeleteRecordFile(remotePathFile2)
 	if err != nil {
-		if err, ok := err.(HttpError); assert.True(t, ok, "error while initial delete is not a http error"+err.Error()) {
+		if err, ok := err.(HTTPError); assert.True(t, ok, "error while initial delete is not a http error"+err.Error()) {
 			if !assert.True(t, err.StatusCode == 404, "cleanup delete error != 404") {
 				return
 			}
@@ -486,7 +486,7 @@ func TestManagementClient_UploadRecordFileString_DeleteRecordFile(t *testing.T) 
 		invalidRecord := "invalid\record\file"
 		err = client.UploadRecordFileString(&invalidRecord, "invalid/record/file.snmprec")
 		if assert.Error(t, err, "no error when uploading invalid record file") {
-			if err, ok := err.(HttpError); assert.True(t, ok, "error is not a http error", err.Error()) {
+			if err, ok := err.(HTTPError); assert.True(t, ok, "error is not a http error", err.Error()) {
 				assert.True(t, err.StatusCode == 400, "error != 400")
 			}
 		}
@@ -495,13 +495,13 @@ func TestManagementClient_UploadRecordFileString_DeleteRecordFile(t *testing.T) 
 
 func TestManagementClient_Tags(t *testing.T) {
 	//Create a new api client
-	client, err := NewManagementClient(configManagementTest.Http.BaseUrl)
+	client, err := NewManagementClient(configManagementTest.HTTP.BaseURL)
 	if !assert.NoError(t, err, "error while creating a new api client") {
 		return
 	}
-	//Set configManagementTest.Http.AuthUsername and password
-	if configManagementTest.Http.AuthUsername != "" && configManagementTest.Http.AuthPassword != "" {
-		err = client.SetUsernameAndPassword(configManagementTest.Http.AuthUsername, configManagementTest.Http.AuthPassword)
+	//Set configManagementTest.HTTP.AuthUsername and password
+	if configManagementTest.HTTP.AuthUsername != "" && configManagementTest.HTTP.AuthPassword != "" {
+		err = client.SetUsernameAndPassword(configManagementTest.HTTP.AuthUsername, configManagementTest.HTTP.AuthPassword)
 		if !assert.NoError(t, err, "error while creating a new api client") {
 			return
 		}
@@ -602,13 +602,13 @@ func TestManagementClient_Tags(t *testing.T) {
 
 func TestManagementClient_Search(t *testing.T) {
 	//Create a new api client
-	client, err := NewManagementClient(configManagementTest.Http.BaseUrl)
+	client, err := NewManagementClient(configManagementTest.HTTP.BaseURL)
 	if !assert.NoError(t, err, "error while creating a new api client") {
 		return
 	}
-	//Set configManagementTest.Http.AuthUsername and password
-	if configManagementTest.Http.AuthUsername != "" && configManagementTest.Http.AuthPassword != "" {
-		err = client.SetUsernameAndPassword(configManagementTest.Http.AuthUsername, configManagementTest.Http.AuthPassword)
+	//Set configManagementTest.HTTP.AuthUsername and password
+	if configManagementTest.HTTP.AuthUsername != "" && configManagementTest.HTTP.AuthPassword != "" {
+		err = client.SetUsernameAndPassword(configManagementTest.HTTP.AuthUsername, configManagementTest.HTTP.AuthPassword)
 		if !assert.NoError(t, err, "error while creating a new api client") {
 			return
 		}
@@ -647,7 +647,7 @@ func TestManagementClient_Search(t *testing.T) {
 		return
 	}
 	if assert.True(t, len(labs) == 1, "there was more than one lab found in search request") {
-		assert.True(t, labs[0].Id == labOn.Id, "the wrong lab was found in search request")
+		assert.True(t, labs[0].ID == labOn.ID, "the wrong lab was found in search request")
 	}
 
 	m = make(map[string]string)
@@ -657,7 +657,7 @@ func TestManagementClient_Search(t *testing.T) {
 		return
 	}
 	if assert.True(t, len(labs) == 1, "there was more than one lab found in search request") {
-		assert.True(t, labs[0].Id == labOff.Id, "the wrong lab was found in search request")
+		assert.True(t, labs[0].ID == labOff.ID, "the wrong lab was found in search request")
 	}
 
 	//this should return no result
@@ -697,7 +697,7 @@ func TestManagementClient_Search(t *testing.T) {
 		return
 	}
 	if assert.True(t, len(agents) == 1, "there was more than one agent found in search request") {
-		assert.True(t, agents[0].Id == agent1.Id, "the wrong lab was found in search request")
+		assert.True(t, agents[0].ID == agent1.ID, "the wrong lab was found in search request")
 	}
 
 	m = make(map[string]string)
@@ -707,7 +707,7 @@ func TestManagementClient_Search(t *testing.T) {
 		return
 	}
 	if assert.True(t, len(agents) == 1, "there was more than one agent found in search request") {
-		assert.True(t, agents[0].Id == agent2.Id, "the wrong lab was found in search request")
+		assert.True(t, agents[0].ID == agent2.ID, "the wrong lab was found in search request")
 	}
 
 	m = make(map[string]string)
@@ -721,17 +721,17 @@ func TestManagementClient_Search(t *testing.T) {
 
 	//ENGINES
 	engineName1 := "TestManagementClient_Search_1"
-	engineId1 := "010203040507080C"
+	engineID1 := "010203040507080C"
 	engineName2 := "TestManagementClient_Search_2"
-	engineId2 := "010203040507080D"
-	engine1, err := createEngineAndCheckForSuccess(t, client, engineName1, engineId1)
+	engineID2 := "010203040507080D"
+	engine1, err := createEngineAndCheckForSuccess(t, client, engineName1, engineID1)
 	if err != nil {
 		return
 	}
 	defer func() {
 		_ = deleteEngineAndCheckForSuccess(t, client, engine1)
 	}()
-	engine2, err := createEngineAndCheckForSuccess(t, client, engineName2, engineId2)
+	engine2, err := createEngineAndCheckForSuccess(t, client, engineName2, engineID2)
 	if err != nil {
 		return
 	}
@@ -741,14 +741,14 @@ func TestManagementClient_Search(t *testing.T) {
 
 	m = make(map[string]string)
 	m["name"] = engineName1
-	m["engine_id"] = engineId1
+	m["engine_id"] = engineID1
 	engines, err := client.GetEngines(m)
 
 	if !assert.NoError(t, err, "error during SearchEngines") {
 		return
 	}
 	if assert.True(t, len(engines) == 1, "there was more than one engine found in search request") {
-		assert.True(t, engines[0].Id == engine1.Id, "the wrong lab was found in search request")
+		assert.True(t, engines[0].ID == engine1.ID, "the wrong lab was found in search request")
 	}
 
 	m = make(map[string]string)
@@ -758,12 +758,12 @@ func TestManagementClient_Search(t *testing.T) {
 		return
 	}
 	if assert.True(t, len(engines) == 1, "there was more than one engine found in search request") {
-		assert.True(t, engines[0].Id == engine2.Id, "the wrong lab was found in search request")
+		assert.True(t, engines[0].ID == engine2.ID, "the wrong lab was found in search request")
 	}
 
 	m = make(map[string]string)
 	m["name"] = engineName1
-	m["engine_id"] = engineId2
+	m["engine_id"] = engineID2
 	engines, err = client.GetEngines(m)
 	if !assert.NoError(t, err, "error during SearchEngines") {
 		return
@@ -800,7 +800,7 @@ func TestManagementClient_Search(t *testing.T) {
 		return
 	}
 	if assert.True(t, len(endpoints) == 1, "there was more than one endpoint found in search request") {
-		assert.True(t, endpoints[0].Id == endpoint1.Id, "the wrong lab was found in search request")
+		assert.True(t, endpoints[0].ID == endpoint1.ID, "the wrong lab was found in search request")
 	}
 
 	m = make(map[string]string)
@@ -810,7 +810,7 @@ func TestManagementClient_Search(t *testing.T) {
 		return
 	}
 	if assert.True(t, len(endpoints) == 1, "there was more than one endpoint found in search request") {
-		assert.True(t, endpoints[0].Id == endpoint2.Id, "the wrong lab was found in search request")
+		assert.True(t, endpoints[0].ID == endpoint2.ID, "the wrong lab was found in search request")
 	}
 
 	m = make(map[string]string)
@@ -855,7 +855,7 @@ func TestManagementClient_Search(t *testing.T) {
 	}
 
 	if assert.True(t, len(users) == 1, "there was more than one user found in search request") {
-		assert.True(t, users[0].Id == user1.Id, "the wrong lab was found in search request")
+		assert.True(t, users[0].ID == user1.ID, "the wrong lab was found in search request")
 	}
 
 	m = make(map[string]string)
@@ -865,7 +865,7 @@ func TestManagementClient_Search(t *testing.T) {
 		return
 	}
 	if assert.True(t, len(users) == 1, "there was more than one user found in search request") {
-		assert.True(t, users[0].Id == user2.Id, "the wrong lab was found in search request")
+		assert.True(t, users[0].ID == user2.ID, "the wrong lab was found in search request")
 	}
 
 	m = make(map[string]string)
@@ -890,13 +890,13 @@ func TestManagementClient_Search(t *testing.T) {
 
 func TestManagementClient_Agent_Failures(t *testing.T) {
 	//Create a new api client
-	client, err := NewManagementClient(configManagementTest.Http.BaseUrl)
+	client, err := NewManagementClient(configManagementTest.HTTP.BaseURL)
 	if !assert.NoError(t, err, "error while creating a new api client") {
 		return
 	}
-	//Set configManagementTest.Http.AuthUsername and password
-	if configManagementTest.Http.AuthUsername != "" && configManagementTest.Http.AuthPassword != "" {
-		err = client.SetUsernameAndPassword(configManagementTest.Http.AuthUsername, configManagementTest.Http.AuthPassword)
+	//Set configManagementTest.HTTP.AuthUsername and password
+	if configManagementTest.HTTP.AuthUsername != "" && configManagementTest.HTTP.AuthPassword != "" {
+		err = client.SetUsernameAndPassword(configManagementTest.HTTP.AuthUsername, configManagementTest.HTTP.AuthPassword)
 		if !assert.NoError(t, err, "error while creating a new api client") {
 			return
 		}
@@ -907,7 +907,7 @@ func TestManagementClient_Agent_Failures(t *testing.T) {
 		//Create Agent with invalid data dir
 		_, err = client.CreateAgent("name", "test-CreateAgent_Failure")
 		if assert.Error(t, err, "no error when an agent with an invalid data dir was created") {
-			if err, ok := err.(HttpError); assert.True(t, ok, "error is not a http error", err.Error()) {
+			if err, ok := err.(HTTPError); assert.True(t, ok, "error is not a http error", err.Error()) {
 				assert.True(t, err.StatusCode == 404, "error != 404")
 			}
 		}
@@ -916,7 +916,7 @@ func TestManagementClient_Agent_Failures(t *testing.T) {
 	//Get Invalid Agent
 	_, err = client.GetAgent(-1)
 	if assert.Error(t, err, "no error when trying to get an invalid agent") {
-		if err, ok := err.(HttpError); assert.True(t, ok, "error is not a http error", err.Error()) {
+		if err, ok := err.(HTTPError); assert.True(t, ok, "error is not a http error", err.Error()) {
 			assert.True(t, err.StatusCode == 404, "error != 404")
 		}
 	}
@@ -924,7 +924,7 @@ func TestManagementClient_Agent_Failures(t *testing.T) {
 	//Delete invalid agent
 	err = client.DeleteAgent(-1)
 	if assert.Error(t, err, "no error when a non existent agent was deleted") {
-		if err, ok := err.(HttpError); assert.True(t, ok, "error is not a http error", err.Error()) {
+		if err, ok := err.(HTTPError); assert.True(t, ok, "error is not a http error", err.Error()) {
 			assert.True(t, err.StatusCode == 404, "error != 404")
 		}
 	}
@@ -939,9 +939,9 @@ func TestManagementClient_Agent_Failures(t *testing.T) {
 	//TODO: this should cause an api error but does not
 	/*
 		//add invalid engine to agent
-		err = client.AddEngineToAgent(agent.Id, -1)
+		err = client.AddEngineToAgent(agent.ID, -1)
 		if assert.Error(t, err, "no error when an invalid engine id was added to an agent") {
-			if err, ok := err.(HttpError); assert.True(t, ok, "error is not a http error", err.Error()) {
+			if err, ok := err.(HTTPError); assert.True(t, ok, "error is not a http error", err.Error()) {
 				assert.True(t, err.StatusCode == 404, "error != 404" , err.Error())
 			}
 		}
@@ -955,9 +955,9 @@ func TestManagementClient_Agent_Failures(t *testing.T) {
 	defer func() { _ = deleteEngineAndCheckForSuccess(t, client, engine) }()
 
 	//add valid engine to invalid agent
-	err = client.AddEngineToAgent(-1, engine.Id)
+	err = client.AddEngineToAgent(-1, engine.ID)
 	if assert.Error(t, err, "no error when an existent engine was added to a non existing agent") {
-		if err, ok := err.(HttpError); assert.True(t, ok, "error is not a http error", err.Error()) {
+		if err, ok := err.(HTTPError); assert.True(t, ok, "error is not a http error", err.Error()) {
 			assert.True(t, err.StatusCode == 400, "error != 400")
 		}
 	}
@@ -970,9 +970,9 @@ func TestManagementClient_Agent_Failures(t *testing.T) {
 	//its removed later, no defer needed
 
 	//add already attached engine to agent
-	err = client.AddEngineToAgent(agent.Id, engine.Id)
+	err = client.AddEngineToAgent(agent.ID, engine.ID)
 	if assert.Error(t, err, "no error when an engine was added twice to an agent") {
-		if err, ok := err.(HttpError); assert.True(t, ok, "error is not a http error", err.Error()) {
+		if err, ok := err.(HTTPError); assert.True(t, ok, "error is not a http error", err.Error()) {
 			assert.True(t, err.StatusCode == 400, "error != 400")
 		}
 	}
@@ -980,23 +980,23 @@ func TestManagementClient_Agent_Failures(t *testing.T) {
 	//remove non existing engine from non existing agent
 	err = client.RemoveEngineFromAgent(-1, -1)
 	if assert.Error(t, err, "no error when removing non existing engine from non existing agent") {
-		if err, ok := err.(HttpError); assert.True(t, ok, "error is not a http error", err.Error()) {
+		if err, ok := err.(HTTPError); assert.True(t, ok, "error is not a http error", err.Error()) {
 			assert.True(t, err.StatusCode == 404, "error != 404")
 		}
 	}
 
 	//remove non existing engine from exisiting agent
-	err = client.RemoveEngineFromAgent(agent.Id, -1)
+	err = client.RemoveEngineFromAgent(agent.ID, -1)
 	if assert.Error(t, err, "no error when removing non existing engine from existing agent") {
-		if err, ok := err.(HttpError); assert.True(t, ok, "error is not a http error", err.Error()) {
+		if err, ok := err.(HTTPError); assert.True(t, ok, "error is not a http error", err.Error()) {
 			assert.True(t, err.StatusCode == 404, "error != 404", err.Error())
 		}
 	}
 
 	//remove existing engine from non exisiting agent
-	err = client.RemoveEngineFromAgent(-1, engine.Id)
+	err = client.RemoveEngineFromAgent(-1, engine.ID)
 	if assert.Error(t, err, "no error when removing existing engine from non existing agent") {
-		if err, ok := err.(HttpError); assert.True(t, ok, "error is not a http error", err.Error()) {
+		if err, ok := err.(HTTPError); assert.True(t, ok, "error is not a http error", err.Error()) {
 			assert.True(t, err.StatusCode == 400, "error != 400", err.Error())
 		}
 	}
@@ -1005,9 +1005,9 @@ func TestManagementClient_Agent_Failures(t *testing.T) {
 	if err != nil {
 		return
 	}
-	err = client.RemoveEngineFromAgent(agent.Id, engine.Id)
+	err = client.RemoveEngineFromAgent(agent.ID, engine.ID)
 	if assert.Error(t, err, "no error when removing an engine from an agent that is not attached to the agent") {
-		if err, ok := err.(HttpError); assert.True(t, ok, "error is not a http error", err.Error()) {
+		if err, ok := err.(HTTPError); assert.True(t, ok, "error is not a http error", err.Error()) {
 			assert.True(t, err.StatusCode == 404, "error != 404", err.Error())
 		}
 	}
@@ -1015,13 +1015,13 @@ func TestManagementClient_Agent_Failures(t *testing.T) {
 
 func TestManagementClient_Lab_Failures(t *testing.T) {
 	//Create a new api client
-	client, err := NewManagementClient(configManagementTest.Http.BaseUrl)
+	client, err := NewManagementClient(configManagementTest.HTTP.BaseURL)
 	if !assert.NoError(t, err, "error while creating a new api client") {
 		return
 	}
-	//Set configManagementTest.Http.AuthUsername and password
-	if configManagementTest.Http.AuthUsername != "" && configManagementTest.Http.AuthPassword != "" {
-		err = client.SetUsernameAndPassword(configManagementTest.Http.AuthUsername, configManagementTest.Http.AuthPassword)
+	//Set configManagementTest.HTTP.AuthUsername and password
+	if configManagementTest.HTTP.AuthUsername != "" && configManagementTest.HTTP.AuthPassword != "" {
+		err = client.SetUsernameAndPassword(configManagementTest.HTTP.AuthUsername, configManagementTest.HTTP.AuthPassword)
 		if !assert.NoError(t, err, "error while creating a new api client") {
 			return
 		}
@@ -1030,7 +1030,7 @@ func TestManagementClient_Lab_Failures(t *testing.T) {
 	//Get Invalid Lab
 	_, err = client.GetLab(-1)
 	if assert.Error(t, err, "no error when trying to get an invalid lab") {
-		if err, ok := err.(HttpError); assert.True(t, ok, "error is not a http error", err.Error()) {
+		if err, ok := err.(HTTPError); assert.True(t, ok, "error is not a http error", err.Error()) {
 			assert.True(t, err.StatusCode == 404, "error != 404")
 		}
 	}
@@ -1038,7 +1038,7 @@ func TestManagementClient_Lab_Failures(t *testing.T) {
 	//Delete invalid lab
 	err = client.DeleteLab(-1)
 	if assert.Error(t, err, "no error when a non existent lab was deleted") {
-		if err, ok := err.(HttpError); assert.True(t, ok, "error is not a http error", err.Error()) {
+		if err, ok := err.(HTTPError); assert.True(t, ok, "error is not a http error", err.Error()) {
 			assert.True(t, err.StatusCode == 404, "error != 404")
 		}
 	}
@@ -1053,9 +1053,9 @@ func TestManagementClient_Lab_Failures(t *testing.T) {
 	//TODO: this should cause an api error but does not
 	/*
 		//add invalid agent to lab
-		err = client.AddAgentToLab(lab.Id, -1)
+		err = client.AddAgentToLab(lab.ID, -1)
 		if assert.Error(t, err, "no error when an invalid agent id was added to an lab") {
-			if err, ok := err.(HttpError); assert.True(t, ok, "error is not a http error", err.Error()) {
+			if err, ok := err.(HTTPError); assert.True(t, ok, "error is not a http error", err.Error()) {
 				assert.True(t, err.StatusCode == 404, "error != 404", err.Error())
 			}
 		}
@@ -1069,9 +1069,9 @@ func TestManagementClient_Lab_Failures(t *testing.T) {
 	defer func() { _ = deleteAgentAndCheckForSuccess(t, client, agent) }()
 
 	//add valid agent to invalid lab
-	err = client.AddAgentToLab(-1, agent.Id)
+	err = client.AddAgentToLab(-1, agent.ID)
 	if assert.Error(t, err, "no error when an existent agent was added to a non existing lab") {
-		if err, ok := err.(HttpError); assert.True(t, ok, "error is not a http error", err.Error()) {
+		if err, ok := err.(HTTPError); assert.True(t, ok, "error is not a http error", err.Error()) {
 			assert.True(t, err.StatusCode == 400, "error != 400")
 		}
 	}
@@ -1084,9 +1084,9 @@ func TestManagementClient_Lab_Failures(t *testing.T) {
 	//its removed later, no defer needed
 
 	//add already attached agent to lab
-	err = client.AddAgentToLab(lab.Id, agent.Id)
+	err = client.AddAgentToLab(lab.ID, agent.ID)
 	if assert.Error(t, err, "no error when an agent was added twice to an lab") {
-		if err, ok := err.(HttpError); assert.True(t, ok, "error is not a http error", err.Error()) {
+		if err, ok := err.(HTTPError); assert.True(t, ok, "error is not a http error", err.Error()) {
 			assert.True(t, err.StatusCode == 400, "error != 400")
 		}
 	}
@@ -1094,23 +1094,23 @@ func TestManagementClient_Lab_Failures(t *testing.T) {
 	//remove non existing agent from non existing lab
 	err = client.RemoveAgentFromLab(-1, -1)
 	if assert.Error(t, err, "no error when removing non existing agent from non existing lab") {
-		if err, ok := err.(HttpError); assert.True(t, ok, "error is not a http error", err.Error()) {
+		if err, ok := err.(HTTPError); assert.True(t, ok, "error is not a http error", err.Error()) {
 			assert.True(t, err.StatusCode == 404, "error != 404")
 		}
 	}
 
 	//remove non existing agent from exisiting lab
-	err = client.RemoveAgentFromLab(lab.Id, -1)
+	err = client.RemoveAgentFromLab(lab.ID, -1)
 	if assert.Error(t, err, "no error when removing non existing agent from existing lab") {
-		if err, ok := err.(HttpError); assert.True(t, ok, "error is not a http error", err.Error()) {
+		if err, ok := err.(HTTPError); assert.True(t, ok, "error is not a http error", err.Error()) {
 			assert.True(t, err.StatusCode == 404, "error != 404", err.Error())
 		}
 	}
 
 	//remove existing agent from non exisiting lab
-	err = client.RemoveAgentFromLab(-1, agent.Id)
+	err = client.RemoveAgentFromLab(-1, agent.ID)
 	if assert.Error(t, err, "no error when removing existing agent from non existing lab") {
-		if err, ok := err.(HttpError); assert.True(t, ok, "error is not a http error", err.Error()) {
+		if err, ok := err.(HTTPError); assert.True(t, ok, "error is not a http error", err.Error()) {
 			assert.True(t, err.StatusCode == 400, "error != 400", err.Error())
 		}
 	}
@@ -1119,9 +1119,9 @@ func TestManagementClient_Lab_Failures(t *testing.T) {
 	if err != nil {
 		return
 	}
-	err = client.RemoveAgentFromLab(lab.Id, agent.Id)
+	err = client.RemoveAgentFromLab(lab.ID, agent.ID)
 	if assert.Error(t, err, "no error when removing an agent from an lab that is not attached to the lab") {
-		if err, ok := err.(HttpError); assert.True(t, ok, "error is not a http error", err.Error()) {
+		if err, ok := err.(HTTPError); assert.True(t, ok, "error is not a http error", err.Error()) {
 			assert.True(t, err.StatusCode == 404, "error != 404", err.Error())
 		}
 	}
@@ -1129,13 +1129,13 @@ func TestManagementClient_Lab_Failures(t *testing.T) {
 
 func TestManagementClient_Engine_Failures(t *testing.T) {
 	//Create a new api client
-	client, err := NewManagementClient(configManagementTest.Http.BaseUrl)
+	client, err := NewManagementClient(configManagementTest.HTTP.BaseURL)
 	if !assert.NoError(t, err, "error while creating a new api client") {
 		return
 	}
-	//Set configManagementTest.Http.AuthUsername and password
-	if configManagementTest.Http.AuthUsername != "" && configManagementTest.Http.AuthPassword != "" {
-		err = client.SetUsernameAndPassword(configManagementTest.Http.AuthUsername, configManagementTest.Http.AuthPassword)
+	//Set configManagementTest.HTTP.AuthUsername and password
+	if configManagementTest.HTTP.AuthUsername != "" && configManagementTest.HTTP.AuthPassword != "" {
+		err = client.SetUsernameAndPassword(configManagementTest.HTTP.AuthUsername, configManagementTest.HTTP.AuthPassword)
 		if !assert.NoError(t, err, "error while creating a new api client") {
 			return
 		}
@@ -1146,7 +1146,7 @@ func TestManagementClient_Engine_Failures(t *testing.T) {
 		//Create Engine with invalid params
 		_, err = client.CreateEngine("name", "this is not a valid engine id")
 		if assert.Error(t, err, "no error when an engine with an invalid engine id was created") {
-			if err, ok := err.(HttpError); assert.True(t, ok, "error is not a http error", err.Error()) {
+			if err, ok := err.(HTTPError); assert.True(t, ok, "error is not a http error", err.Error()) {
 				assert.True(t, err.StatusCode == 404, "error != 404")
 			}
 		}
@@ -1155,7 +1155,7 @@ func TestManagementClient_Engine_Failures(t *testing.T) {
 	//Get Invalid Engine
 	_, err = client.GetEngine(-1)
 	if assert.Error(t, err, "no error when trying to get an invalid engine") {
-		if err, ok := err.(HttpError); assert.True(t, ok, "error is not a http error", err.Error()) {
+		if err, ok := err.(HTTPError); assert.True(t, ok, "error is not a http error", err.Error()) {
 			assert.True(t, err.StatusCode == 404, "error != 404")
 		}
 	}
@@ -1163,7 +1163,7 @@ func TestManagementClient_Engine_Failures(t *testing.T) {
 	//Delete invalid engine
 	err = client.DeleteEngine(-1)
 	if assert.Error(t, err, "no error when a non existent engine was deleted") {
-		if err, ok := err.(HttpError); assert.True(t, ok, "error is not a http error", err.Error()) {
+		if err, ok := err.(HTTPError); assert.True(t, ok, "error is not a http error", err.Error()) {
 			assert.True(t, err.StatusCode == 404, "error != 404")
 		}
 	}
@@ -1179,7 +1179,7 @@ func TestManagementClient_Engine_Failures(t *testing.T) {
 	/*
 		_, err = client.CreateEngine("test-Engine_Failures-engine1", "010203040507080B")
 		if assert.Error(t, err, "no error when an engine was created twice") {
-			if err, ok := err.(HttpError); assert.True(t, ok, "error is not a http error", err.Error()) {
+			if err, ok := err.(HTTPError); assert.True(t, ok, "error is not a http error", err.Error()) {
 				assert.True(t, err.StatusCode == 404, "error != 404")
 			}
 		}
@@ -1188,9 +1188,9 @@ func TestManagementClient_Engine_Failures(t *testing.T) {
 	//TODO: this should cause an api error but does not
 	/*
 		//add invalid user to engine
-		err = client.AddUserToEngine(engine.Id, -1)
+		err = client.AddUserToEngine(engine.ID, -1)
 		if assert.Error(t, err, "no error when an invalid user id was added to an engine") {
-			if err, ok := err.(HttpError); assert.True(t, ok, "error is not a http error", err.Error()) {
+			if err, ok := err.(HTTPError); assert.True(t, ok, "error is not a http error", err.Error()) {
 				assert.True(t, err.StatusCode == 404, "error != 404" , err.Error())
 			}
 		}
@@ -1204,9 +1204,9 @@ func TestManagementClient_Engine_Failures(t *testing.T) {
 	defer func() { _ = deleteUserAndCheckForSuccess(t, client, user) }()
 
 	//add valid user to invalid engine
-	err = client.AddUserToEngine(-1, user.Id)
+	err = client.AddUserToEngine(-1, user.ID)
 	if assert.Error(t, err, "no error when an existent user was added to a non existing engine") {
-		if err, ok := err.(HttpError); assert.True(t, ok, "error is not a http error", err.Error()) {
+		if err, ok := err.(HTTPError); assert.True(t, ok, "error is not a http error", err.Error()) {
 			assert.True(t, err.StatusCode == 400, "error != 400")
 		}
 	}
@@ -1219,9 +1219,9 @@ func TestManagementClient_Engine_Failures(t *testing.T) {
 	//its removed later, no defer needed
 
 	//add already attached user to engine
-	err = client.AddUserToEngine(engine.Id, user.Id)
+	err = client.AddUserToEngine(engine.ID, user.ID)
 	if assert.Error(t, err, "no error when an user was added twice to an engine") {
-		if err, ok := err.(HttpError); assert.True(t, ok, "error is not a http error", err.Error()) {
+		if err, ok := err.(HTTPError); assert.True(t, ok, "error is not a http error", err.Error()) {
 			assert.True(t, err.StatusCode == 400, "error != 400")
 		}
 	}
@@ -1229,23 +1229,23 @@ func TestManagementClient_Engine_Failures(t *testing.T) {
 	//remove non existing user from non existing engine
 	err = client.RemoveUserFromEngine(-1, -1)
 	if assert.Error(t, err, "no error when removing non existing user from non existing engine") {
-		if err, ok := err.(HttpError); assert.True(t, ok, "error is not a http error", err.Error()) {
+		if err, ok := err.(HTTPError); assert.True(t, ok, "error is not a http error", err.Error()) {
 			assert.True(t, err.StatusCode == 404, "error != 404")
 		}
 	}
 
 	//remove non existing user from exisiting engine
-	err = client.RemoveUserFromEngine(engine.Id, -1)
+	err = client.RemoveUserFromEngine(engine.ID, -1)
 	if assert.Error(t, err, "no error when removing non existing user from existing engine") {
-		if err, ok := err.(HttpError); assert.True(t, ok, "error is not a http error", err.Error()) {
+		if err, ok := err.(HTTPError); assert.True(t, ok, "error is not a http error", err.Error()) {
 			assert.True(t, err.StatusCode == 404, "error != 404", err.Error())
 		}
 	}
 
 	//remove existing user from non exisiting engine
-	err = client.RemoveUserFromEngine(-1, user.Id)
+	err = client.RemoveUserFromEngine(-1, user.ID)
 	if assert.Error(t, err, "no error when removing existing user from non existing engine") {
-		if err, ok := err.(HttpError); assert.True(t, ok, "error is not a http error", err.Error()) {
+		if err, ok := err.(HTTPError); assert.True(t, ok, "error is not a http error", err.Error()) {
 			assert.True(t, err.StatusCode == 400, "error != 400", err.Error())
 		}
 	}
@@ -1254,9 +1254,9 @@ func TestManagementClient_Engine_Failures(t *testing.T) {
 	if err != nil {
 		return
 	}
-	err = client.RemoveUserFromEngine(engine.Id, user.Id)
+	err = client.RemoveUserFromEngine(engine.ID, user.ID)
 	if assert.Error(t, err, "no error when removing an user from an engine that is not attached to the engine") {
-		if err, ok := err.(HttpError); assert.True(t, ok, "error is not a http error", err.Error()) {
+		if err, ok := err.(HTTPError); assert.True(t, ok, "error is not a http error", err.Error()) {
 			assert.True(t, err.StatusCode == 404, "error != 404", err.Error())
 		}
 	}
@@ -1264,9 +1264,9 @@ func TestManagementClient_Engine_Failures(t *testing.T) {
 	//TODO: this should cause an api error but does not
 	/*
 		//add invalid user to engine
-		err = client.AddEndpointToEngine(engine.Id, -1)
+		err = client.AddEndpointToEngine(engine.ID, -1)
 		if assert.Error(t, err, "no error when an invalid endpoint id was added to an engine") {
-			if err, ok := err.(HttpError); assert.True(t, ok, "error is not a http error", err.Error()) {
+			if err, ok := err.(HTTPError); assert.True(t, ok, "error is not a http error", err.Error()) {
 				assert.True(t, err.StatusCode == 404, "error != 404" , err.Error())
 			}
 		}
@@ -1280,9 +1280,9 @@ func TestManagementClient_Engine_Failures(t *testing.T) {
 	defer func() { _ = deleteEndpointAndCheckForSuccess(t, client, endpoint) }()
 
 	//add valid endpoint to invalid engine
-	err = client.AddEndpointToEngine(-1, endpoint.Id)
+	err = client.AddEndpointToEngine(-1, endpoint.ID)
 	if assert.Error(t, err, "no error when an existent endpoint was added to a non existing engine") {
-		if err, ok := err.(HttpError); assert.True(t, ok, "error is not a http error", err.Error()) {
+		if err, ok := err.(HTTPError); assert.True(t, ok, "error is not a http error", err.Error()) {
 			assert.True(t, err.StatusCode == 400, "error != 400")
 		}
 	}
@@ -1295,9 +1295,9 @@ func TestManagementClient_Engine_Failures(t *testing.T) {
 	//its removed later, no defer needed
 
 	//add already attached endpoint to engine
-	err = client.AddEndpointToEngine(engine.Id, endpoint.Id)
+	err = client.AddEndpointToEngine(engine.ID, endpoint.ID)
 	if assert.Error(t, err, "no error when an endpoint was added twice to an engine") {
-		if err, ok := err.(HttpError); assert.True(t, ok, "error is not a http error", err.Error()) {
+		if err, ok := err.(HTTPError); assert.True(t, ok, "error is not a http error", err.Error()) {
 			assert.True(t, err.StatusCode == 400, "error != 400")
 		}
 	}
@@ -1305,23 +1305,23 @@ func TestManagementClient_Engine_Failures(t *testing.T) {
 	//remove non existing endpoint from non existing engine
 	err = client.RemoveEndpointFromEngine(-1, -1)
 	if assert.Error(t, err, "no error when removing non existing endpoint from non existing engine") {
-		if err, ok := err.(HttpError); assert.True(t, ok, "error is not a http error", err.Error()) {
+		if err, ok := err.(HTTPError); assert.True(t, ok, "error is not a http error", err.Error()) {
 			assert.True(t, err.StatusCode == 404, "error != 404")
 		}
 	}
 
 	//remove non existing endpoint from exisiting engine
-	err = client.RemoveEndpointFromEngine(engine.Id, -1)
+	err = client.RemoveEndpointFromEngine(engine.ID, -1)
 	if assert.Error(t, err, "no error when removing non existing endpoint from existing engine") {
-		if err, ok := err.(HttpError); assert.True(t, ok, "error is not a http error", err.Error()) {
+		if err, ok := err.(HTTPError); assert.True(t, ok, "error is not a http error", err.Error()) {
 			assert.True(t, err.StatusCode == 404, "error != 404", err.Error())
 		}
 	}
 
 	//remove existing endpoint from non exisiting engine
-	err = client.RemoveEndpointFromEngine(-1, endpoint.Id)
+	err = client.RemoveEndpointFromEngine(-1, endpoint.ID)
 	if assert.Error(t, err, "no error when removing existing endpoint from non existing engine") {
-		if err, ok := err.(HttpError); assert.True(t, ok, "error is not a http error", err.Error()) {
+		if err, ok := err.(HTTPError); assert.True(t, ok, "error is not a http error", err.Error()) {
 			assert.True(t, err.StatusCode == 400, "error != 400", err.Error())
 		}
 	}
@@ -1330,9 +1330,9 @@ func TestManagementClient_Engine_Failures(t *testing.T) {
 	if err != nil {
 		return
 	}
-	err = client.RemoveEndpointFromEngine(engine.Id, endpoint.Id)
+	err = client.RemoveEndpointFromEngine(engine.ID, endpoint.ID)
 	if assert.Error(t, err, "no error when removing an endpoint from an engine that is not attached to the engine") {
-		if err, ok := err.(HttpError); assert.True(t, ok, "error is not a http error", err.Error()) {
+		if err, ok := err.(HTTPError); assert.True(t, ok, "error is not a http error", err.Error()) {
 			assert.True(t, err.StatusCode == 404, "error != 404", err.Error())
 		}
 	}
@@ -1340,13 +1340,13 @@ func TestManagementClient_Engine_Failures(t *testing.T) {
 
 func TestManagementClient_User_Failures(t *testing.T) {
 	//Create a new api client
-	client, err := NewManagementClient(configManagementTest.Http.BaseUrl)
+	client, err := NewManagementClient(configManagementTest.HTTP.BaseURL)
 	if !assert.NoError(t, err, "error while creating a new api client") {
 		return
 	}
-	//Set configManagementTest.Http.AuthUsername and password
-	if configManagementTest.Http.AuthUsername != "" && configManagementTest.Http.AuthPassword != "" {
-		err = client.SetUsernameAndPassword(configManagementTest.Http.AuthUsername, configManagementTest.Http.AuthPassword)
+	//Set configManagementTest.HTTP.AuthUsername and password
+	if configManagementTest.HTTP.AuthUsername != "" && configManagementTest.HTTP.AuthPassword != "" {
+		err = client.SetUsernameAndPassword(configManagementTest.HTTP.AuthUsername, configManagementTest.HTTP.AuthPassword)
 		if !assert.NoError(t, err, "error while creating a new api client") {
 			return
 		}
@@ -1357,7 +1357,7 @@ func TestManagementClient_User_Failures(t *testing.T) {
 		//Create User with invalid params
 		_, err = client.CreateUser("test-User_Failures-user1", "test-User_Failures-user1")
 		if assert.Error(t, err, "no error when an user with invalid params was created") {
-			if err, ok := err.(HttpError); assert.True(t, ok, "error is not a http error", err.Error()) {
+			if err, ok := err.(HTTPError); assert.True(t, ok, "error is not a http error", err.Error()) {
 				assert.True(t, err.StatusCode == 404, "error != 404")
 			}
 		}
@@ -1366,7 +1366,7 @@ func TestManagementClient_User_Failures(t *testing.T) {
 	//Get Invalid User
 	_, err = client.GetUser(-1)
 	if assert.Error(t, err, "no error when trying to get an invalid user") {
-		if err, ok := err.(HttpError); assert.True(t, ok, "error is not a http error", err.Error()) {
+		if err, ok := err.(HTTPError); assert.True(t, ok, "error is not a http error", err.Error()) {
 			assert.True(t, err.StatusCode == 404, "error != 404")
 		}
 	}
@@ -1374,7 +1374,7 @@ func TestManagementClient_User_Failures(t *testing.T) {
 	//Delete invalid user
 	err = client.DeleteUser(-1)
 	if assert.Error(t, err, "no error when a non existent user was deleted") {
-		if err, ok := err.(HttpError); assert.True(t, ok, "error is not a http error", err.Error()) {
+		if err, ok := err.(HTTPError); assert.True(t, ok, "error is not a http error", err.Error()) {
 			assert.True(t, err.StatusCode == 404, "error != 404")
 		}
 	}
@@ -1386,9 +1386,9 @@ func TestManagementClient_User_Failures(t *testing.T) {
 	}
 	defer func() { _ = deleteUserAndCheckForSuccess(t, client, user) }()
 
-	_, err = client.CreateUserWithTag("test-User_Failures-user1", "test-User_Failures-user1", "", "", "", "", configManagementTest.TestTagId)
+	_, err = client.CreateUserWithTag("test-User_Failures-user1", "test-User_Failures-user1", "", "", "", "", configManagementTest.TestTagID)
 	if assert.Error(t, err, "no error when creating a user twice") {
-		if err, ok := err.(HttpError); assert.True(t, ok, "error is not a http error", err.Error()) {
+		if err, ok := err.(HTTPError); assert.True(t, ok, "error is not a http error", err.Error()) {
 			assert.True(t, err.StatusCode == 400, "error != 400")
 		}
 	}
@@ -1396,22 +1396,22 @@ func TestManagementClient_User_Failures(t *testing.T) {
 
 func TestManagementClient_Endpoint_Failures(t *testing.T) {
 	//Create a new api client
-	client, err := NewManagementClient(configManagementTest.Http.BaseUrl)
+	client, err := NewManagementClient(configManagementTest.HTTP.BaseURL)
 	if !assert.NoError(t, err, "error while creating a new api client") {
 		return
 	}
 	//Set username and password
-	if configManagementTest.Http.AuthUsername != "" && configManagementTest.Http.AuthPassword != "" {
-		err = client.SetUsernameAndPassword(configManagementTest.Http.AuthUsername, configManagementTest.Http.AuthPassword)
+	if configManagementTest.HTTP.AuthUsername != "" && configManagementTest.HTTP.AuthPassword != "" {
+		err = client.SetUsernameAndPassword(configManagementTest.HTTP.AuthUsername, configManagementTest.HTTP.AuthPassword)
 		if !assert.NoError(t, err, "error while creating a new api client") {
 			return
 		}
 	}
 
 	//Create Endpoint with invalid input
-	_, err = client.CreateEndpointWithTag("test-Endpoint_Failures-endpoint1", "noAddress", "no valid protocol", configManagementTest.TestTagId)
+	_, err = client.CreateEndpointWithTag("test-Endpoint_Failures-endpoint1", "noAddress", "no valid protocol", configManagementTest.TestTagID)
 	if assert.Error(t, err, "no error when an endpoint with invalid params was created") {
-		if err, ok := err.(HttpError); assert.True(t, ok, "error is not a http error", err.Error()) {
+		if err, ok := err.(HTTPError); assert.True(t, ok, "error is not a http error", err.Error()) {
 			assert.True(t, err.StatusCode == 400, "error != 400")
 		}
 	}
@@ -1419,7 +1419,7 @@ func TestManagementClient_Endpoint_Failures(t *testing.T) {
 	//Get Invalid Endpoint
 	_, err = client.GetEndpoint(-1)
 	if assert.Error(t, err, "no error when trying to get an invalid endpoint") {
-		if err, ok := err.(HttpError); assert.True(t, ok, "error is not a http error", err.Error()) {
+		if err, ok := err.(HTTPError); assert.True(t, ok, "error is not a http error", err.Error()) {
 			assert.True(t, err.StatusCode == 404, "error != 404")
 		}
 	}
@@ -1427,7 +1427,7 @@ func TestManagementClient_Endpoint_Failures(t *testing.T) {
 	//Delete invalid endpoint
 	err = client.DeleteEndpoint(-1)
 	if assert.Error(t, err, "no error when a non existent endpoint was deleted") {
-		if err, ok := err.(HttpError); assert.True(t, ok, "error is not a http error", err.Error()) {
+		if err, ok := err.(HTTPError); assert.True(t, ok, "error is not a http error", err.Error()) {
 			assert.True(t, err.StatusCode == 404, "error != 404")
 		}
 	}
@@ -1441,7 +1441,7 @@ func TestManagementClient_Endpoint_Failures(t *testing.T) {
 
 	_, err = client.CreateEndpoint("test-Endpoint_Failures-endpoint1", "1.1.1.1:9753", "udpv4")
 	if assert.Error(t, err, "no error when creating a endpoint twice") {
-		if err, ok := err.(HttpError); assert.True(t, ok, "error is not a http error", err.Error()) {
+		if err, ok := err.(HTTPError); assert.True(t, ok, "error is not a http error", err.Error()) {
 			assert.True(t, err.StatusCode == 400, "error != 400")
 		}
 	}
