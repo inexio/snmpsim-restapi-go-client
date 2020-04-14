@@ -80,26 +80,26 @@ git clone https://github.com/inexio/snmpsim-restapi-go-client.git
 	user, err := client.CreateUser("uniqueUserIdentifier", "myUser", "", "", "", "") //optionally use CreateUserWithTag(..., tagId) [tagId as last param]
 
 	//Add user to engine
-	err = client.AddUserToEngine(engine.Id, user.Id)
+	err = client.AddUserToEngine(engine.ID, user.ID)
 
 	//Add endpoint to engine
-	err = client.AddEndpointToEngine(engine.Id, endpoint.Id)
+	err = client.AddEndpointToEngine(engine.ID, endpoint.ID)
 
 	//Create a new agent
 	agent, err := client.CreateAgent("myAgent", "agent/data/dir") //optionally use CreateAgentWithTag(..., tagId) [tagId as last param]
 
 
 	//Add engine to agent
-	err = client.AddEngineToAgent(agent.Id, engine.Id)
+	err = client.AddEngineToAgent(agent.ID, engine.ID)
 
 	//Add agent to lab
-	err = client.AddAgentToLab(lab.Id, agent.Id)
+	err = client.AddAgentToLab(lab.ID, agent.ID)
 
 	//Set lab power on
-	err = client.SetLabPower(lab.Id, true)
+	err = client.SetLabPower(lab.ID, true)
 	
 	//Delete lab
-	err = client.DeleteLab(lab.Id)
+	err = client.DeleteLab(lab.ID)
 ```
 
 ### Metrics Client
